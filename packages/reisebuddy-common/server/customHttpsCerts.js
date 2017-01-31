@@ -35,7 +35,7 @@
 				var crt = caMap[options.hostname || options.host];
 				if(crt) {
 					options.ca = caMap[options.hostname || options.host];
-					console.debug("Issuing secured request to ", (options.hostname || options.host));
+					console.log("Issuing secured request to ", (options.hostname || options.host));
 				}
 			}
 			return request.call(https, options, cb);
