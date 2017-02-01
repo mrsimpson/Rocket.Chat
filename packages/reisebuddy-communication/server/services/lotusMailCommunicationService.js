@@ -68,8 +68,10 @@ class LotusMailCommunicationService {
 	 * @return {string} the parsed hex or str if it doesn't look like a hexstring
 	 */
 	handleEncodings(str) {
-		const trimString = str.replace(/\s/g, ""); // there are some mysterious whitespaces in hex strings
-		return /^([0-9A-Fa-f]{4})+$/.test(trimString) ? this.parseHexString(trimString) : str; // regex: exactly multiple 4byte hex
+		const trimString = str.replace(/\s/g, "");// there are some mysterious whitespaces in hex strings
+		//return trimString;
+		const result =/^([0-9A-Fa-f]{4})+$/.test(trimString) ? this.parseHexString(trimString) : str; // regex: exactly multiple 4byte hex
+		return result
 	}
 
 	/**
@@ -79,11 +81,41 @@ class LotusMailCommunicationService {
 	 */
 	parseHexString(str) {
 		var result = '';
-		while (str.length >= 4) {
-			result += String.fromCharCode(parseInt(str.substring(0, 4), 16));
-			str = str.substring(4, str.length);
+
+		if ((str.length == 16) && (/^\d+$/.test(str))){
+			return str;
 		}
-		return result;
+		else {
+			while (str.length >= 4) {
+
+				var firstFourDigist = str.substring(0,4);
+
+				var stub = parseInt(firstFourDigist, 16);
+				var converted = String.fromCharCode(stub);
+
+				// get space
+				if (converted == ' '){
+					result += converted;
+					str = str.substr(4, str.length);
+				}
+
+				else if(/^[a-zA-Z0-9]*$/.test(converted)){
+					result += converted;
+					str = str.substr(4, str.length);
+				}
+				else if(/^[\u4e00-\u9faf]+$/.test(converted)) {
+					result += firstFourDigist;
+					str = str.substr(4, str.length);
+				}
+				else {
+					var stub = parseInt(firstFourDigist, 16);
+					result += String.fromCharCode(stub);
+					str = str.substr(4, str.length);
+				}
+
+			}
+			return result;
+		}
 	}
 
 	/**
