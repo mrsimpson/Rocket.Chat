@@ -62,6 +62,10 @@ Template.messageBox.helpers
 	fileUploadAllowedMediaTypes: ->
 		return RocketChat.settings.get('FileUpload_MediaTypeWhiteList')
 
+	livechatFeatures:->
+		toggle = RocketChat.settings.get('Reisebuddy_Livechat_Functions')
+		return toggle
+
 	showMic: ->
 		if not Template.instance().isMessageFieldEmpty.get()
 			return

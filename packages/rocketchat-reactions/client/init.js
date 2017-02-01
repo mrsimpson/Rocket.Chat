@@ -36,35 +36,40 @@ Template.room.events({
 });
 
 Meteor.startup(function() {
-	RocketChat.MessageAction.addButton({
-		id: 'reaction-message',
-		icon: 'icon-people-plus',
-		i18nLabel: 'Reactions',
-		context: [
-			'message',
-			'message-mobile'
-		],
-		action(event) {
-			const data = Blaze.getData(event.currentTarget);
 
-			event.stopPropagation();
+	toggle = RocketChat.settings.get('Reisebuddy_Edit_Message');
+	if (toggle == false){
+		RocketChat.MessageAction.addButton({
+			id: 'reaction-message',
+			icon: 'icon-people-plus',
+			i18nLabel: 'Reactions',
+			context: [
+				'message',
+				'message-mobile'
+			],
+			action(event) {
+				const data = Blaze.getData(event.currentTarget);
 
-			RocketChat.EmojiPicker.open(event.currentTarget, (emoji) => {
-				Meteor.call('setReaction', ':' + emoji + ':', data._arguments[1]._id);
-			});
-		},
-		validation(message) {
-			let room = RocketChat.models.Rooms.findOne({ _id: message.rid });
-			let user = Meteor.user();
+				event.stopPropagation();
 
-			if (Array.isArray(room.muted) && room.muted.indexOf(user.username) !== -1) {
-				return false;
-			} else if (Array.isArray(room.usernames) && room.usernames.indexOf(user.username) === -1) {
-				return false;
-			}
+				RocketChat.EmojiPicker.open(event.currentTarget, (emoji) => {
+					Meteor.call('setReaction', ':' + emoji + ':', data._arguments[1]._id);
+				});
+			},
+			validation(message) {
+				let room = RocketChat.models.Rooms.findOne({ _id: message.rid });
+				let user = Meteor.user();
 
-			return true;
-		},
-		order: 22
-	});
+				if (Array.isArray(room.muted) && room.muted.indexOf(user.username) !== -1) {
+					return false;
+				} else if (Array.isArray(room.usernames) && room.usernames.indexOf(user.username) === -1) {
+					return false;
+				}
+
+				return true;
+			},
+			order: 22
+		});
+	}
+
 });

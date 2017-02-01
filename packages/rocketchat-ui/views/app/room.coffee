@@ -104,6 +104,10 @@ Template.room.helpers
 	showToggleFavorite: ->
 		return true if isSubscribed(this._id) and favoritesEnabled()
 
+	showFavorite:->
+		setting = RocketChat.settings.get('Reisebuddy_Livechat_Favorite')
+		return setting
+
 	viewMode: ->
 		viewMode = Meteor.user()?.settings?.preferences?.viewMode
 		switch viewMode
