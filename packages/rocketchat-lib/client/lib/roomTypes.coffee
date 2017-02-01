@@ -71,6 +71,16 @@ RocketChat.roomTypes = new class
 	findRoom = (roomType, identifier, user) ->
 		return roomTypes[roomType]?.findRoom identifier, user
 
+	###
+  RB: adds the option to override the template for a room
+	@param identifier the room identifer (like 'l' for livechat)
+	@param newTemplateName the new template
+	###
+	updateTemplate = (identifier, newTemplateName) ->
+		unless identifier? and roomTypes[identifier] and newTemplateName?
+			return false
+		roomTypes[identifier].template = newTemplateName;
+
 	# addType: addType
 	getTypes: getAllTypes
 	getIdentifiers: getIdentifiers
@@ -85,5 +95,7 @@ RocketChat.roomTypes = new class
 	getRouteLink: getRouteLink
 
 	checkCondition: checkCondition
+
+	updateTemplate: updateTemplate
 
 	add: add

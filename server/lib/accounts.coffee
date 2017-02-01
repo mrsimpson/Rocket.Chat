@@ -2,41 +2,28 @@
 accountsConfig = { forbidClientAccountCreation: true, loginExpirationInDays: RocketChat.settings.get 'Accounts_LoginExpiration' }
 Accounts.config accountsConfig
 
-RocketChat.settings.get 'Accounts_AllowedDomainsList', (_id, value) ->
-	domainWhiteList = _.map value.split(','), (domain) -> domain.trim()
-	restrictCreationByEmailDomain = if domainWhiteList.length == 1 then domainWhiteList[0] else (email) ->
-		ret = false
-		for domain in domainWhiteList
-			if email.match('@' + RegExp.escape(domain) + '$')
-				ret = true
-				break;
-
-		return ret
-	delete Accounts._options['restrictCreationByEmailDomain']
-
-	if not _.isEmpty value
-		Accounts.config({ restrictCreationByEmailDomain: restrictCreationByEmailDomain });
-
 Accounts.emailTemplates.siteName = RocketChat.settings.get 'Site_Name';
 Accounts.emailTemplates.from = "#{RocketChat.settings.get 'Site_Name'} <#{RocketChat.settings.get 'From_Email'}>";
 
-verifyEmailText = Accounts.emailTemplates.verifyEmail.text
-Accounts.emailTemplates.verifyEmail.text = (user, url) ->
+verifyEmailHtml = Accounts.emailTemplates.verifyEmail.text
+Accounts.emailTemplates.verifyEmail.html = (user, url) ->
 	url = url.replace Meteor.absoluteUrl(), Meteor.absoluteUrl() + 'login/'
-	verifyEmailText user, url
+	verifyEmailHtml user, url
 
-resetPasswordText = Accounts.emailTemplates.resetPassword.text
-Accounts.emailTemplates.resetPassword.text = (user, url) ->
+resetPasswordHtml = Accounts.emailTemplates.resetPassword.text
+Accounts.emailTemplates.resetPassword.html = (user, url) ->
 	url = url.replace /\/#\//, '/'
-	resetPasswordText user, url
+	resetPasswordHtml user, url
 
 Accounts.emailTemplates.enrollAccount.subject = (user) ->
 	if RocketChat.settings.get 'Accounts_Enrollment_Customized'
-		return RocketChat.settings.get 'Accounts_Enrollment_Email_Subject'
+		subject = RocketChat.settings.get 'Accounts_Enrollment_Email_Subject'
 	else
-		return TAPi18n.__('Accounts_Enrollment_Email_Subject_Default', { lng: user?.language || RocketChat.settings.get('language') || 'en' })
+		subject = TAPi18n.__('Accounts_Enrollment_Email_Subject_Default', { lng: user?.language || RocketChat.settings.get('language') || 'en' })
 
-Accounts.emailTemplates.enrollAccount.text = (user, url) ->
+	return RocketChat.placeholders.replace(subject);
+
+Accounts.emailTemplates.enrollAccount.html = (user, url) ->
 
 	if RocketChat.settings.get 'Accounts_Enrollment_Customized'
 		html = RocketChat.settings.get 'Accounts_Enrollment_Email'
@@ -104,7 +91,9 @@ Accounts.insertUserDoc = _.wrap Accounts.insertUserDoc, (insertUserDoc, options,
 
 	RocketChat.authz.addUserRoles(_id, roles)
 
-	RocketChat.callbacks.run 'afterCreateUser', options, user
+	Meteor.defer ->
+		RocketChat.callbacks.run 'afterCreateUser', options, user
+
 	return _id
 
 Accounts.validateLoginAttempt (login) ->
@@ -112,6 +101,10 @@ Accounts.validateLoginAttempt (login) ->
 
 	if login.allowed isnt true
 		return login.allowed
+
+	# bypass for livechat users
+	if login.user.type is 'visitor'
+		return true
 
 	if !!login.user?.active isnt true
 		throw new Meteor.Error 'error-user-is-not-activated', 'User is not activated', { function: 'Accounts.validateLoginAttempt' }
@@ -134,6 +127,35 @@ Accounts.validateLoginAttempt (login) ->
 	return true
 
 Accounts.validateNewUser (user) ->
+	# bypass for livechat users
+	if user.type is 'visitor'
+		return true
+
 	if RocketChat.settings.get('Accounts_Registration_AuthenticationServices_Enabled') is false and RocketChat.settings.get('LDAP_Enable') is false and not user.services?.password?
 		throw new Meteor.Error 'registration-disabled-authentication-services', 'User registration is disabled for authentication services'
+	return true
+
+
+Accounts.validateNewUser (user) ->
+	# bypass for livechat users
+	if user.type is 'visitor'
+		return true
+
+	domainWhiteList = RocketChat.settings.get('Accounts_AllowedDomainsList')
+
+	if _.isEmpty s.trim(domainWhiteList)
+		return true
+
+	domainWhiteList = _.map(domainWhiteList.split(','), (domain) -> domain.trim())
+
+	if user.emails?.length > 0
+		ret = false
+		email = user.emails[0].address
+		for domain in domainWhiteList
+			if email.match('@' + RegExp.escape(domain) + '$')
+				ret = true
+				break
+
+		return ret
+
 	return true

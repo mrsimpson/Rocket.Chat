@@ -1,6 +1,8 @@
 Template.flexTabBar.helpers
 	active: ->
 		return 'active' if @template is RocketChat.TabBar.getTemplate() and RocketChat.TabBar.isFlexOpen()
+	initialOpen: ->
+		return 'initialOpen' if this.initialOpen
 	buttons: ->
 		return RocketChat.TabBar.getButtons()
 	title: ->
@@ -16,10 +18,12 @@ Template.flexTabBar.events
 		if RocketChat.TabBar.isFlexOpen() and RocketChat.TabBar.getTemplate() is @template
 			RocketChat.TabBar.closeFlex()
 			$('.flex-tab').css('max-width', '')
+			$('.main-content').css('right', '')
 		else
 			if not @openClick? or @openClick(e,t)
 				if @width?
 					$('.flex-tab').css('max-width', "#{@width}px")
+					$('.main-content').css('right', "#{@width + 40}px")
 				else
 					$('.flex-tab').css('max-width', '')
 
@@ -40,4 +44,8 @@ Template.flexTabBar.onCreated ->
 					exists = true
 
 			unless exists
-				RocketChat.TabBar.closeFlex()
+				RocketChat.TabBar.closeFlex ->
+					variable = $('.flex-tab-bar .initialOpen:not(.hidden)')
+					variable.click();
+			else
+				$('.flex-tab-bar .initialOpen:not(.active)').click()

@@ -1,0 +1,39 @@
+<template name="reisebuddy_visitorEdit">
+    <div class="visitor-edit">
+        <form class="edit-form" autocomplete="off">
+			{{#unless crmIntegrationActive}}
+				{{#with visitor}}
+                    <h3>{{username}}</h3>
+                    <div class="input-line">
+                        <label for="nocrm-name-input">{{_ "Name"}}</label>
+                        <input id="nocrm-name-input" type="text" name="name" autocomplete="off" value="{{name}}"/>
+                    </div>
+                    <div class="input-line">
+                        <label for="nocrm-email-input">{{_ "Email"}}</label>
+                        <input id="nocrm-email-input" type="email" name="email" autocomplete="off" value="{{email}}"/>
+                    </div>
+                    <div class="input-line">
+                        <label for="nocrm-phone-input">{{_ "Phone"}}</label>
+                        <input id="nocrm-phone-input" type="text" name="phone" autocomplete="off" value="{{phone}}"/>
+                    </div>
+				{{/with}}
+			{{/unless}}
+
+			{{#with room}}
+                <h3>{{_ "Conversation" }}</h3>
+                <div class="input-line">
+                    <label for="nocrm-topic-input">{{_ "Topic"}}</label>
+                    <input id="nocrm-topic-input" type="text" name="topic" autocomplete="off" value="{{topic}}"/>
+                </div>
+                <div class="input-line">
+                    <label for="nocrm-tags-input">{{_ "Tags"}}</label>
+                    <input id="nocrm-tags-input" type="text" name="tags" autocomplete="off" value="{{joinTags}}"/>
+                </div>
+			{{/with}}
+            <nav>
+                <button class='button button-block blue save'><span>{{_ "Save"}}</span></button>
+                <button class='button button-block cancel secondary' type="button"><span>{{_ "Cancel"}}</span></button>
+            </nav>
+        </form>
+    </div>
+</template>

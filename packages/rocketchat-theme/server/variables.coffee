@@ -8,7 +8,7 @@ RocketChat.theme.addPublicColor "quaternary-font-color", "#ffffff"
 
 RocketChat.theme.addPublicColor "action-buttons-color", "#13679a"
 RocketChat.theme.addPublicColor "active-channel-background-color", "rgba(255, 255, 255, 0.075)"
-RocketChat.theme.addPublicColor "active-channel-font-color", "rgba(255, 255, 255, 0.75)"
+RocketChat.theme.addPublicColor "active-channel-font-color", "rgba(255, 255, 255, 1.0)"
 RocketChat.theme.addPublicColor "blockquote-background", "#cccccc"
 RocketChat.theme.addPublicColor "clean-buttons-color", "rgba(0, 0, 0, 0.25)"
 RocketChat.theme.addPublicColor "code-background", "#f8f8f8"
@@ -26,7 +26,7 @@ RocketChat.theme.addPublicColor "smallprint-hover-color", "#ffffff"
 RocketChat.theme.addPublicColor "status-away", "#fcb316"
 RocketChat.theme.addPublicColor "status-busy", "#d30230"
 RocketChat.theme.addPublicColor "status-offline", "rgba(150, 150, 150, 0.50)"
-RocketChat.theme.addPublicColor "status-online", "#35ac19"
+RocketChat.theme.addPublicColor "status-online", "#00ff00"
 RocketChat.theme.addPublicColor "unread-notification-color", "#1dce73"
 
 

@@ -1,0 +1,82 @@
+@rooms-box-width: 300px;
+@flex-tab-width: 600px;
+
+.account-box {
+    .options .status {
+        &.online:after {
+            background-color: #00ff00;
+        }
+    }
+}
+.user-view {
+    li {
+        color: @primary-font-color;
+        line-height: 28px;
+    }
+    .info p {
+        color: @primary-font-color;
+    }
+}
+.side-nav {
+    .unread {
+        .unread {
+            right: 40px;
+            z-index: 10;
+            display: inline-block;
+        }
+    }
+    .rooms-list {
+        h3 {
+            color: #fff;
+        }
+        .livechat-section {
+            h3 i {
+                float: right;
+            }
+            .livechat-status {
+                float: none;
+            }
+            h4 {
+                &:extend(.side-nav h3);
+                padding-left: 2em;
+                margin-top: auto;
+                font-style: italic;
+            }
+            .room-answered {
+                .unread {
+                    background-color: #008000;
+                    color: rgba(255,255,255,0.9);
+                }
+            }
+        }
+        .wrapper > ul, .livechat-section > ul {
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding-top: 3px;
+            padding-bottom: 6px;
+        }
+    }
+}
+.reactive-table tbody tr:hover {
+    cursor: pointer;
+}
+.list.livechatCurrentChats {
+    h3 {
+        font-weight: bold;
+        margin-top: 3em;
+    }
+}
+
+
+.swal-form select {
+    display: block;
+    margin: 0;
+    width: 96%;
+    font-family: sans-serif;
+    font-size: 18px;
+    box-shadow: none;
+    padding: 10px;
+    border: solid 1px #dcdcdc;
+    transition: box-shadow 0.3s border 0.3s;
+    height: initial;
+    color: #bdbdbd;
+}

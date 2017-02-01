@@ -1,0 +1,90 @@
+<template name="reisebuddy_visitorInfo">
+    <div class="content">
+		{{#if editing}}
+			{{#if templateExists 'reisebuddy_visitorEdit'}}
+				{{> reisebuddy_visitorEdit (editDetails)}}
+			{{else}}
+				{{> visitorEdit (editDetails)}}
+			{{/if}}
+		{{/if}}
+		{{#if forwarding}}
+			{{> visitorForward (forwardDetails)}}
+		{{/if}}
+        <div class="user-view {{showDetail}}">
+            <h4>{{_ "Conversation"}}</h4>
+            <div class="about clearfix">
+				{{#unless user.crmContactId}}
+					{{#with user}}
+                        <div class="info">
+                            <h3 title="{{username}}"><i class="status-{{status}}"></i> {{username}}</h3>
+                            <p>{{name}}</p>
+
+                            <ul>
+								{{#if utc}}<li><i class="icon-clock"></i>{{userTime}} (UTC {{utc}})</li>{{/if}}
+								{{#each emails}} <li><i class="icon-mail"></i> {{address}}{{#if verified}}&nbsp;<i class="icon-ok"></i>{{/if}}</li> {{/each}}
+								{{#each phone}} <li><i class="icon-phone"></i> {{phoneNumber}}</li> {{/each}}
+								{{#if lastLogin}} <li><i class="icon-calendar"></i> {{_ "Created_at"}}: {{createdAt}}</li> {{/if}}
+								{{#if lastLogin}} <li><i class="icon-calendar"></i> {{_ "Last_login"}}: {{lastLogin}}</li> {{/if}}
+								{{#if ip}}<li><i class="icon-laptop"></i><span>{{ip}}</span></li>{{/if}}
+								{{#if os}}<li><i class="{{osIcon}}"></i><span>{{os}}</span></li>{{/if}}
+								{{#if browser}}<li><i class="{{browserIcon}}"></i><span>{{browser}}</span></li>{{/if}}
+                            </ul>
+                        </div>
+					{{/with}}
+				{{/unless}}
+
+				{{#with room}}
+                    <div class="info">
+                        <ul>
+							{{#if sms}}
+                                <li><i class="icon-mobile"></i>{{_ "SMS_Enabled"}}</li>
+							{{/if}}
+							{{#if topic}}
+                                <li><strong>{{_ "Topic"}}</strong>: {{topic}}</li>
+							{{/if}}
+							{{#if tags}}
+                                <li><strong>{{_ "Tags"}}</strong>: {{joinTags}}</li>
+							{{/if}}
+							{{#if duration}}
+                                <li><strong>{{_ "Duration"}}</strong>: {{formatDateMilliseconds duration }}</li>
+							{{/if}}
+                        </ul>
+                    </div>
+				{{/with}}
+            </div>
+
+            <div class="list-view">
+				{{#if canSeeButtons}}
+                    <nav class="centered-buttons">
+                        <button class='button lightblue edit-livechat button-block'><span><i class='icon-edit'></i> {{_ "Edit_Metadata"}}</span></button>
+						{{#if roomOpen}}
+                            <button class='button close-livechat button-block'><span><i class='icon-download'></i> {{_ "Close_Conversation"}}</span></button>
+                            <button class='button lightblue merge-livechat button-block'><span><i class='icon-recycle'></i> {{_ "Merge"}}</span></button>
+						{{/if}}
+						{{#if guestPool}}
+                            <button class="button return-inquiry button-block"><span><i class="icon-ccw"></i> {{_ "Return_Conversation"}}</span></button>
+						{{/if}}
+                    </nav>
+				{{/if}}
+            </div>
+
+			{{#if customFields}}
+                <div class="visitor-custom-fields">
+                    <h4>{{_ "Custom_Fields"}}</h4>
+
+                    <div class="visitor-scroll">
+                        <ul>
+							{{#each customFields}}
+                                <li>{{label}}: {{value}}</li>
+							{{/each}}
+                        </ul>
+                    </div>
+                </div>
+			{{/if}}
+
+			{{> visitorCRM }}
+
+			{{> visitorNavigation .}}
+        </div>
+    </div>
+</template>

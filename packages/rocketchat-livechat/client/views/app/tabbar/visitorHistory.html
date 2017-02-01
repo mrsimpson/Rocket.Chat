@@ -7,9 +7,13 @@
 			<div class="visitor-navigation">
 				<div class="visitor-scroll">
 					<ul>
-						{{#each previousChats}}
-							<li><a href="{{pathFor "live" code=code}}">{{date}}</a></li>
-						{{/each}}
+						{{#if Template.subscriptionsReady}}
+							{{#each previousChats}}
+								<li><a href="{{pathFor "live" code=code}}" target="_blank">{{title}}</a></li>
+							{{/each}}
+						{{else}}
+							<li>{{_ "Loading..."}}</li>
+						{{/if}}
 					</ul>
 				</div>
 			</div>

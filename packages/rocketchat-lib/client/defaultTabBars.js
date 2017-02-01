@@ -4,7 +4,7 @@ RocketChat.TabBar.addButton({
 	i18nTitle: 'Search',
 	icon: 'icon-search',
 	template: 'messageSearch',
-	order: 1
+	order: 2
 });
 
 RocketChat.TabBar.addButton({
@@ -13,7 +13,7 @@ RocketChat.TabBar.addButton({
 	i18nTitle: 'User_Info',
 	icon: 'icon-user',
 	template: 'membersList',
-	order: 2
+	order: 3
 });
 
 RocketChat.TabBar.addButton({
@@ -22,7 +22,7 @@ RocketChat.TabBar.addButton({
 	i18nTitle: 'Members_List',
 	icon: 'icon-users',
 	template: 'membersList',
-	order: 2
+	order: 4
 });
 
 RocketChat.TabBar.addButton({
@@ -31,5 +31,5 @@ RocketChat.TabBar.addButton({
 	i18nTitle: 'Room_uploaded_file_list',
 	icon: 'icon-attach',
 	template: 'uploadedFilesList',
-	order: 3
+	order: 5
 });

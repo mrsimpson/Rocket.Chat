@@ -14,6 +14,10 @@ RocketChat.settings.get('Livechat_Knowledge_Apiai_Language', function(key, value
 });
 
 RocketChat.callbacks.add('afterSaveMessage', function(message, room) {
+
+	if(!!RocketChat.settings.get('Reisebuddy_active')) {
+		return message;
+	}
 	// skips this callback if the message was edited
 	if (message.editedAt) {
 		return message;
@@ -59,4 +63,4 @@ RocketChat.callbacks.add('afterSaveMessage', function(message, room) {
 	});
 
 	return message;
-}, RocketChat.callbacks.priority.LOW);
+}, RocketChat.callbacks.priority.LOW, 'externalWebHook');

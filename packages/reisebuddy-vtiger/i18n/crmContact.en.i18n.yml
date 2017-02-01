@@ -1,0 +1,16 @@
+create_contact: create contact
+crm_communication_error: Error talking to CRM
+crm_contact_information: CRM contact
+edit_contact: edit contact
+update_contact: update contact
+
+firstname: First name
+lastname: Last name
+mobile: Mobile
+phone: Phone
+email: eMail
+address: Address
+street: Street
+zipcode: Zip code
+city: City
+description: Description

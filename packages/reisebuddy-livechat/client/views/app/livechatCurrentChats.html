@@ -1,0 +1,14 @@
+<template name="reisebuddy_livechatCurrentChats">
+
+	{{#if Template.subscriptionsReady}}
+        <div class="list livechatCurrentChats">
+            <h3>{{_ "Open_Conversations"}}</h3>
+			{{> reactiveTable collection=openLivechatRoom settings=tableSettings}}
+
+            <h3>{{_ "Closed_Conversations"}}</h3>
+			{{> reactiveTable collection=closedLivechatRoom settings=tableSettings}}
+        </div>
+	{{else}}
+		{{_ "Loading"}}
+	{{/if}}
+</template>

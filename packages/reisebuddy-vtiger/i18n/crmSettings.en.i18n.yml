@@ -1,0 +1,4 @@
+DBRB_vtiger_url: Adress of VTiger-webservices (including webservice.php)
+DBRB_vtiger_userAccessKey: User Access Key of technical user
+DBRB_vtiger_username: Technical user for B2B-communication
+DBRB_vtiger_user_id: User ID of respsonsible-to-be

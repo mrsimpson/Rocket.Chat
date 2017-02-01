@@ -1,0 +1,9 @@
+Reisebuddy_MailConf: Lotus Notes connection
+SMS_Out_Reisebuddy_enabled: Send outgoing messages
+SmsOut_Reisebuddy_lotusEndpoint: endpoint of lotus for outgoing sms
+SmsOut_Reisebuddy_baseAddress: base address of the sms-gateway; 016012345@address
+SmsOut_Reisebuddy_defaultSubject: Default subject
+SmsOut_Reisebuddy_username: Username for the endpoint of lotus for outgoing sms
+SmsOut_Reisebuddy_password: Password for the endpoint of lotus for outgoing sms
+MailIn_Reisebuddy_username: Username for the ingoing Auth-Endpoint
+MailIn_Reisebuddy_password: Password for the ingoing Auth-Endpoint

@@ -1,7 +1,8 @@
 # Insert server unique id if it doesn't exist
-if not RocketChat.models.Settings.findOneById 'uniqueID'
-	RocketChat.models.Settings.createWithIdAndValue 'uniqueID', process.env.DEPLOYMENT_ID or Random.id()
+RocketChat.settings.add('uniqueID', process.env.DEPLOYMENT_ID or Random.id(), { public: true, hidden: true });
 
+# When you define a setting and want to add a description, you don't need to automatically define the i18nDescription
+# if you add a node to the i18n.json with the same setting name but with `_Description` it will automatically work.
 RocketChat.settings.addGroup 'Accounts', ->
 	@add 'Accounts_AllowDeleteOwnAccount', false, { type: 'boolean', public: true, enableQuery: { _id: 'Accounts_AllowUserProfileChange', value: true } }
 	@add 'Accounts_AllowUserProfileChange', true, { type: 'boolean', public: true }
@@ -21,6 +22,7 @@ RocketChat.settings.addGroup 'Accounts', ->
 		@add 'Accounts_AllowedDomainsList', '', { type: 'string', public: true }
 
 		@add 'Accounts_BlockedDomainsList', '', { type: 'string' }
+		@add 'Accounts_BlockedUsernameList', '', { type: 'string' }
 		@add 'Accounts_UseDefaultBlockedDomainsList', true, { type: 'boolean' }
 		@add 'Accounts_UseDNSDomainCheck', true, { type: 'boolean' }
 
@@ -91,6 +93,7 @@ RocketChat.settings.addGroup 'General', ->
 	@add 'CDN_PREFIX', '', { type: 'string' }
 	@add 'Force_SSL', false, { type: 'boolean', public: true }
 	@add 'GoogleTagManager_id', '', { type: 'string', public: true }
+	@add 'GoogleSiteVerification_id', '', { type: 'string', public: false }
 	@add 'Restart', 'restart_server', { type: 'action', actionText: 'Restart_the_server' }
 
 	@section 'UTF8', ->
@@ -103,11 +106,24 @@ RocketChat.settings.addGroup 'General', ->
 	@section 'Notifications', ->
 		@add 'Desktop_Notifications_Duration', 0, { type: 'int', public: true, i18nDescription: 'Desktop_Notification_Durations_Description' }
 
+	@section 'REST API', ->
+		@add 'API_User_Limit', 500, { type: 'int', public: true, i18nDescription: 'API_User_Limit' }
+
 
 RocketChat.settings.addGroup 'Email', ->
 	@section 'Header and Footer', ->
-		@add 'Email_Header', '', { type: 'code', code: 'text/html', multiline: true, i18nLabel: 'Header' }
-		@add 'Email_Footer', '', { type: 'code', code: 'text/html', multiline: true, i18nLabel: 'Footer' }
+		@add 'Email_Header', '<table border="0" cellspacing="0" cellpadding="0" width="100%" bgcolor="#f3f3f3" style="color:#4a4a4a;font-family: Helvetica,Arial,sans-serif;font-size:14px;line-height:20px;border-collapse:callapse;border-spacing:0;margin:0 auto"><tr><td style="padding:1em"><table border="0" cellspacing="0" cellpadding="0" align="center" width="100%" style="width:100%;margin:0 auto;max-width:800px"><tr><td bgcolor="#ffffff" style="background-color:#ffffff; border: 1px solid #DDD; font-size: 10pt; font-family: Helvetica,Arial,sans-serif;"><table width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td style="background-color: #04436a;"><h1 style="font-family: Helvetica,Arial,sans-serif; padding: 0 1em; margin: 0; line-height: 70px; color: #FFF;">[Site_Name]</h1></td></tr><tr><td style="padding: 1em; font-size: 10pt; font-family: Helvetica,Arial,sans-serif;">', {
+			type: 'code',
+			code: 'text/html',
+			multiline: true,
+			i18nLabel: 'Header'
+		}
+		@add 'Email_Footer', '</td></tr></table></td></tr><tr><td border="0" cellspacing="0" cellpadding="0" width="100%" style="font-family: Helvetica,Arial,sans-serif; max-width: 800px; margin: 0 auto; padding: 1.5em; text-align: center; font-size: 8pt; color: #999;">Powered by <a href="https://rocket.chat" target="_blank">Rocket.Chat</a></td></tr></table></td></tr></table>', {
+			type: 'code',
+			code: 'text/html',
+			multiline: true,
+			i18nLabel: 'Footer'
+		}
 
 	@section 'SMTP', ->
 		@add 'SMTP_Host', '', { type: 'string', env: true, i18nLabel: 'Host' }
@@ -142,15 +158,19 @@ RocketChat.settings.addGroup 'Message', ->
 	@add 'Message_AlwaysSearchRegExp', false, { type: 'boolean' }
 	@add 'Message_ShowEditedStatus', true, { type: 'boolean', public: true }
 	@add 'Message_ShowDeletedStatus', false, { type: 'boolean', public: true }
+	@add 'Message_AllowBadWordsFilter', false, { type: 'boolean', public: true}
+	@add 'Message_BadWordsFilterList', '', {type: 'string', public: true}
 	@add 'Message_KeepHistory', false, { type: 'boolean', public: true }
 	@add 'Message_MaxAll', 0, { type: 'int', public: true }
 	@add 'Message_MaxAllowedSize', 5000, { type: 'int', public: true }
 	@add 'Message_ShowFormattingTips', true, { type: 'boolean', public: true }
+	@add 'Message_SetNameToAliasEnabled', false, { type: 'boolean', public: false, i18nDescription: 'Message_SetNameToAliasEnabled_Description' }
 	@add 'Message_AudioRecorderEnabled', true, { type: 'boolean', public: true, i18nDescription: 'Message_AudioRecorderEnabledDescription' }
 	@add 'Message_GroupingPeriod', 300, { type: 'int', public: true, i18nDescription: 'Message_GroupingPeriodDescription' }
 	@add 'API_Embed', true, { type: 'boolean', public: true }
 	@add 'API_EmbedDisabledFor', '', { type: 'string', public: true, i18nDescription: 'API_EmbedDisabledFor_Description' }
 	@add 'API_EmbedIgnoredHosts', 'localhost, 127.0.0.1, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16', { type: 'string', i18nDescription: 'API_EmbedIgnoredHosts_Description' }
+	@add 'API_EmbedSafePorts', '80, 443', { type: 'string' }
 	@add 'Message_TimeFormat', 'LT', { type: 'string', public: true, i18nDescription: 'Message_TimeFormat_Description' }
 	@add 'Message_DateFormat', 'LL', { type: 'string', public: true, i18nDescription: 'Message_DateFormat_Description' }
 
@@ -202,10 +222,10 @@ RocketChat.settings.addGroup 'Layout', ->
 
 	@section 'User Interface', ->
 		@add 'UI_DisplayRoles', true, { type: 'boolean', public: true }
+		@add 'UI_Merge_Channels_Groups', true, { type: 'boolean', public: true }
 
 
 RocketChat.settings.addGroup 'Logs', ->
-	@add 'Debug_Level', 'error', { type: 'select', values: [ { key: 'error', i18nLabel: 'Only_errors' }, { key: 'debug', i18nLabel: 'All_logs' } ] }
 	@add 'Log_Level', '0', { type: 'select', values: [ { key: '0', i18nLabel: '0_Errors_Only' }, { key: '1', i18nLabel: '1_Errors_and_Information' }, { key: '2', i18nLabel: '2_Erros_Information_and_Debug' } ] , public: true }
 	@add 'Log_Package', false, { type: 'boolean', public: true }
 	@add 'Log_File', false, { type: 'boolean', public: true }

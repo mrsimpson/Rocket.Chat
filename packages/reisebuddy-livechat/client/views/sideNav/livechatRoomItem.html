@@ -1,0 +1,12 @@
+<template name="livechatRoomItem">
+    <li class="link-room-{{rid}} {{active}} {{#if unread}}has-unread{{/if}} {{#if alert}}has-alert{{/if}}">
+        <a class="open-room" href="{{route}}" title="{{name}}">
+            <i class="{{roomIcon}} {{userStatus}}" aria-label=""></i>
+            <span class='name'>{{name}}</span>
+			{{#if isLoading }}
+                <i class='icon-spinner animate-spin' style="width: auto; height: auto;" ></i>
+			{{/if}}
+            <span class="unread" title="Eingang vor {{sinceLastActivity}} Minuten">{{sinceLastActivity}}</span>
+        </a>
+    </li>
+</template>

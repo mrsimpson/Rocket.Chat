@@ -1,0 +1,4 @@
+DBRB_vtiger_url: Adresse des VTiger-Webservices (inkl. webservice.php)
+DBRB_vtiger_userAccessKey: User Access Key des technischer Benutzers
+DBRB_vtiger_username: Technischer Benutzer zur Kommunikation
+DBRB_vtiger_user_id: User-ID des zuzuordnenden Benutzers

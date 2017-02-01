@@ -32,6 +32,14 @@ RocketChat.models.Subscriptions = new class extends RocketChat.models._Base
 
 		return @find query, options
 
+	findByUserIdUpdatedAfter: (userId, updatedAt, options) ->
+		query =
+			"u._id": userId
+			_updatedAt:
+				$gt: updatedAt
+
+		return @find query, options
+
 	# FIND
 	findByRoomIdAndRoles: (roomId, roles, options) ->
 		roles = [].concat roles
@@ -48,13 +56,18 @@ RocketChat.models.Subscriptions = new class extends RocketChat.models._Base
 
 		return @find query, options
 
-	findByNameContainingAndTypes: (name, types, options) ->
-		nameRegex = new RegExp s.trim(s.escapeRegExp(name)), "i"
-
+	findByTypeAndUserId: (type, userId, options) ->
 		query =
-			t:
-				$in: types
-				name: nameRegex
+			t: type
+			'u._id': userId
+
+		return @find query, options
+
+	findByTypeNameAndUserId: (type, name, userId, options) ->
+		query =
+			t: type
+			name: name
+			'u._id': userId
 
 		return @find query, options
 
@@ -104,16 +117,19 @@ RocketChat.models.Subscriptions = new class extends RocketChat.models._Base
 
 		return @update query, update
 
-	openByRoomIdAndUserId: (roomId, userId) ->
+# RB: For closed rooms: Don't re-open it once the room is being displayed (e. g. from administration-view)
+	openByRoomIdAndUserId: (roomId, userId, markAsOpen = true) ->
 		query =
 			rid: roomId
 			'u._id': userId
 
+
 		update =
 			$set:
-				open: true
+				open: markAsOpen
 
 		return @update query, update
+# /RB
 
 	setAsReadByRoomIdAndUserId: (roomId, userId) ->
 		query =
@@ -129,6 +145,19 @@ RocketChat.models.Subscriptions = new class extends RocketChat.models._Base
 
 		return @update query, update
 
+	setAsUnreadByRoomIdAndUserId: (roomId, userId, firstMessageUnreadTimestamp) ->
+		query =
+			rid: roomId
+			'u._id': userId
+
+		update =
+			$set:
+				open: true
+				alert: true
+				ls: firstMessageUnreadTimestamp
+
+		return @update query, update
+
 	setFavoriteByRoomIdAndUserId: (roomId, userId, favorite=true) ->
 		query =
 			rid: roomId
@@ -140,7 +169,7 @@ RocketChat.models.Subscriptions = new class extends RocketChat.models._Base
 
 		return @update query, update
 
-	updateNameByRoomId: (roomId, name) ->
+	updateNameAndAlertByRoomId: (roomId, name) ->
 		query =
 			rid: roomId
 
@@ -148,6 +177,16 @@ RocketChat.models.Subscriptions = new class extends RocketChat.models._Base
 			$set:
 				name: name
 				alert: true
+
+		return @update query, update, { multi: true }
+
+	updateNameByRoomId: (roomId, name) ->
+		query =
+			rid: roomId
+
+		update =
+			$set:
+				name: name
 
 		return @update query, update, { multi: true }
 

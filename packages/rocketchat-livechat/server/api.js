@@ -7,6 +7,14 @@ const Api = new Restivus({
 
 Api.addRoute('sms-incoming/:service', {
 	post() {
+
+// RB: Deactivate SMS-Inbpund via other services than Notes-Communication service
+//		@see packages/reisebuddy-communication/server/reisebuddyIncomingApi.js
+		if(!!RocketChat.settings.get('Reisebuddy_active')) {
+			return {statusCode: 404}
+		}
+// /RB
+
 		const SMSService = RocketChat.SMS.getService(this.urlParams.service);
 
 		const sms = SMSService.parse(this.bodyParams);
@@ -16,6 +24,11 @@ Api.addRoute('sms-incoming/:service', {
 		let sendMessage = {
 			message: {
 				_id: Random.id()
+			},
+			roomInfo: {
+				sms: {
+					from: sms.to
+				}
 			}
 		};
 
@@ -41,34 +54,31 @@ Api.addRoute('sms-incoming/:service', {
 			});
 
 			visitor = RocketChat.models.Users.findOneById(userId);
-
-			sendMessage.roomInfo = {
-				sms: {
-					from: sms.to
-				}
-			};
 		}
 
 		sendMessage.message.msg = sms.body;
-
 		sendMessage.guest = visitor;
 
-		const message = SMSService.response.call(this, RocketChat.Livechat.sendMessage(sendMessage));
+		try {
+			const message = SMSService.response.call(this, RocketChat.Livechat.sendMessage(sendMessage));
 
-		Meteor.defer(() => {
-			if (sms.extra) {
-				if (sms.extra.fromCountry) {
-					Meteor.call('livechat:setCustomField', sendMessage.message.token, 'country', sms.extra.fromCountry);
+			Meteor.defer(() => {
+				if (sms.extra) {
+					if (sms.extra.fromCountry) {
+						Meteor.call('livechat:setCustomField', sendMessage.message.token, 'country', sms.extra.fromCountry);
+					}
+					if (sms.extra.fromState) {
+						Meteor.call('livechat:setCustomField', sendMessage.message.token, 'state', sms.extra.fromState);
+					}
+					if (sms.extra.fromCity) {
+						Meteor.call('livechat:setCustomField', sendMessage.message.token, 'city', sms.extra.fromCity);
+					}
 				}
-				if (sms.extra.fromState) {
-					Meteor.call('livechat:setCustomField', sendMessage.message.token, 'state', sms.extra.fromState);
-				}
-				if (sms.extra.fromCity) {
-					Meteor.call('livechat:setCustomField', sendMessage.message.token, 'city', sms.extra.fromCity);
-				}
-			}
-		});
+			});
 
-		return message;
+			return message;
+		} catch (e) {
+			return SMSService.error.call(this, e);
+		}
 	}
 });

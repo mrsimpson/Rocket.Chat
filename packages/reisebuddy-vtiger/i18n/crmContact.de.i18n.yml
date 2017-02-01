@@ -1,0 +1,17 @@
+create_contact: Kontakt anlegen
+crm_communication_error: Fehler bei der CRM-Kommunikation
+crm_contact_information: Kontakt
+edit_contact: Kontakt bearbeiten
+update_contact: Kontakt aktualisieren
+
+firstname: Vorname
+lastname: Nachname
+mobile: Handynummer
+phone: Telefonnummer
+email: E-Mail
+address: Adresse
+street: Straße und Hausnummer
+zipcode: Postleitzahl
+city: Ort
+description: Beschreibung
+

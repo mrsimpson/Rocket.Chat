@@ -1,0 +1,58 @@
+<template name="visitorCRM">
+    <div class="about">
+        <div class="list-view">
+			{{#with crmInfo}}
+				{{#if error}}
+                    <div class="crm-error">{{_ "crm_communication_error"}}</div>
+				{{else}}
+                    <h3>{{_ "crm_contact_information"}}</h3>
+					{{#if isEditing}}
+						{{> visitorCRMEdit (editDetails)}}
+					{{else}}
+                        <div class="crm-contact">
+							{{#if isLoading}}
+								{{_ "Loading..."}}
+							{{else}}
+								{{#with crmInfo}}
+									{{#with contact}}
+                                        <div class="clearfix">
+                                            <h4 title="{{lastname}}">{{firstname}} {{lastname}}</h4>
+											{{#if description}}<div class="crm-contact-description">{{nl2br description}}</div>{{/if}}
+                                            <ul>
+												{{#if email}}
+                                                    <li><i class="icon-mail"></i> {{email}}</li> {{/if}}
+												{{#if phone}}
+                                                    <li><i class="icon-phone"></i> {{phone}}</li> {{/if}}
+												{{#if mobile}}
+                                                    <li><i class="icon-mobile"></i> {{mobile}}</li> {{/if}}
+												{{#if hasAddress}}
+                                                    <h5>{{_ "address"}}</h5>
+                                                    <div class="mailing-address info">
+														{{#if mailingstreet}}
+                                                            <li>{{mailingstreet}}</li> {{/if}}
+														{{#if mailingcity}}
+                                                            <li>{{#if mailingzip}}{{mailingzip}} {{/if}}{{mailingcity}}</li> {{/if}}
+                                                    </div>
+												{{/if}}
+                                            </ul>
+                                            <nav class="centered-buttons">
+                                                <button class='button edit-contact button-block'>
+                                                    <span>{{_ "edit_contact"}}</span>
+                                                </button>
+                                            </nav>
+                                        </div>
+									{{else}}
+                                        <nav class="centered-buttons">
+                                            <button class='button create-contact button-block'>
+                                                <span>{{_ "create_contact"}}</span></button>
+                                        </nav>
+									{{/with}}
+								{{/with}}
+							{{/if}}
+                        </div>
+					{{/if}}
+				{{/if}}
+			{{/with}}
+        </div>
+    </div>
+</template>

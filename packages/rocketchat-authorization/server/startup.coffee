@@ -14,6 +14,7 @@ Meteor.startup ->
 		{ _id: 'bulk-create-c', roles : ['admin'] }
 		{ _id: 'bulk-register-user', roles : ['admin'] }
 		{ _id: 'create-c', roles : ['admin', 'user'] }
+		{ _id: 'create-d', roles : ['admin', 'user'] }
 		{ _id: 'create-p', roles : ['admin', 'user'] }
 		{ _id: 'create-user', roles : ['admin'] }
 		{ _id: 'delete-c', roles : ['admin'] }
@@ -31,6 +32,7 @@ Meteor.startup ->
 		{ _id: 'manage-integrations', roles : ['admin'] }
 		{ _id: 'manage-own-integrations', roles : ['bot'] }
 		{ _id: 'manage-oauth-apps', roles : ['admin'] }
+		{ _id: 'mention-all', roles : ['admin', 'moderator', 'owner', 'user'] }
 		{ _id: 'mute-user', roles : ['admin', 'moderator', 'owner'] }
 		{ _id: 'remove-user', roles : ['admin', 'moderator', 'owner'] }
 		{ _id: 'run-import', roles : ['admin'] }
@@ -41,6 +43,8 @@ Meteor.startup ->
 		{ _id: 'view-c-room', roles : ['admin', 'user', 'bot'] }
 		{ _id: 'view-d-room', roles : ['admin', 'user'] }
 		{ _id: 'view-full-other-user-info', roles : ['admin'] }
+		{ _id: 'view-history', roles : ['user'] }
+		{ _id: 'view-joined-room', roles: ['guest'] }
 		{ _id: 'view-logs', roles : ['admin'] }
 		{ _id: 'view-other-user-channels', roles : ['admin'] }
 		{ _id: 'view-p-room', roles : ['admin', 'user'] }
@@ -60,6 +64,7 @@ Meteor.startup ->
 		{ name: 'owner', scope: 'Subscriptions', description: 'Owner' }
 		{ name: 'user', scope: 'Users', description: '' }
 		{ name: 'bot', scope: 'Users', description: '' }
+		{ name: 'guest', scope: 'Users', description: '' }
 	]
 
 	for role in defaultRoles

@@ -141,7 +141,12 @@ class @ChatMessages
 			this.editing.saved = this.input.value
 			this.editing.savedCursor = this.input.selectionEnd
 
-	send: (rid, input) ->
+	###*
+	# * @param {string} rim room ID
+	# * @param {Element} input DOM element
+	# * @param {function?} done callback
+	###
+	send: (rid, input, done = ->) ->
 		if _.trim(input.value) isnt ''
 			readMessage.enable()
 			readMessage.readNow()
@@ -170,14 +175,30 @@ class @ChatMessages
 				#Check if message starts with /command
 				if msg[0] is '/'
 					match = msg.match(/^\/([^\s]+)(?:\s+(.*))?$/m)
-					if match? and RocketChat.slashCommands.commands[match[1]]
-						command = match[1]
-						param = match[2]
-						Meteor.call 'slashCommand', {cmd: command, params: param, msg: msgObject }
+					if match?
+						if RocketChat.slashCommands.commands[match[1]]
+							commandOptions = RocketChat.slashCommands.commands[match[1]]
+							command = match[1]
+							param = match[2]
+							if commandOptions.clientOnly
+								commandOptions.callback(command, param, msgObject)
+							else
+								Meteor.call 'slashCommand', {cmd: command, params: param, msg: msgObject }
+							return
+						invalidCommandMsg =
+							_id: Random.id()
+							rid: rid
+							ts: new Date
+							msg: TAPi18n.__('No_such_command', { command: match[1] })
+							u:
+								username: "rocketbot"
+							private: true
+						ChatMessage.upsert { _id: invalidCommandMsg._id }, invalidCommandMsg
 						return
 
 				Meteor.call 'sendMessage', msgObject
-				
+				done()
+
 		# If edited message was emptied we ask for deletion
 		else if this.editing.element
 			message = this.getMessageById this.editing.id
@@ -185,9 +206,9 @@ class @ChatMessages
 			# Restore original message in textbox in case delete is canceled
 			this.resetToDraft this.editing.id
 
-			this.confirmDeleteMsg message
+			this.confirmDeleteMsg message, done
 
-	confirmDeleteMsg: (message) ->
+	confirmDeleteMsg: (message, done = ->) ->
 		return if RocketChat.MessageTypes.isSystemMessage(message)
 		swal {
 			title: t('Are_you_sure')
@@ -212,6 +233,7 @@ class @ChatMessages
 			this.deleteMsg message
 
 			this.$input.focus()
+			done()
 
 		# In order to avoid issue "[Callback not called when still animating](https://github.com/t4t5/sweetalert/issues/528)"
 		$('.sweet-alert').addClass 'visible'
@@ -306,7 +328,7 @@ class @ChatMessages
 		$input = $(input)
 		k = event.which
 		this.resize(input)
-		if k is 13 and not event.shiftKey # Enter without shift
+		if k is 13 and not event.shiftKey and not event.ctrlKey and not event.altKey # Enter without shift/ctrl/alt
 			event.preventDefault()
 			event.stopPropagation()
 			this.send(rid, input)

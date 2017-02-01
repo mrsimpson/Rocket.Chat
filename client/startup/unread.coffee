@@ -30,7 +30,8 @@ Meteor.startup ->
 				if subscription.alert is true
 					unreadAlert = '•'
 
-			readMessage.refreshUnreadMark(subscription.rid)
+			if RoomManager.openedRooms[subscription.t + subscription.name]
+				readMessage.refreshUnreadMark(subscription.rid)
 
 		menu.updateUnreadBars()
 
@@ -51,7 +52,7 @@ Meteor.startup ->
 		animation: 'none'
 
 	Tracker.autorun ->
-		siteName = RocketChat.settings.get 'Site_Name'
+		siteName = RocketChat.settings.get('Site_Name') or ''
 
 		unread = Session.get 'unread'
 		fireGlobalEvent 'unread-changed', unread
