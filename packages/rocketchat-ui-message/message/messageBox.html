@@ -3,10 +3,12 @@
 		<form class="message-form" method="post" action="/">
 			{{> messagePopupConfig getPopupConfig}}
 			<div class="message-input">
-				<div class="message-buttons file">
-					<i class="icon-attach file"></i>
-					<input type="file" accept="{{fileUploadAllowedMediaTypes}}">
-				</div>
+				{{# if livechatFeatures }}
+					<div class="message-buttons file">
+						<i class="icon-attach file"></i>
+						<input type="file" accept="{{fileUploadAllowedMediaTypes}}">
+					</div>
+				{{/if }}
 				<div class="input-message-container">
 					<textarea dir="auto" name="msg" maxlength="{{maxMessageLength}}" class="input-message autogrow-short" placeholder="{{_ 'Message'}}"></textarea>
 
@@ -15,22 +17,24 @@
 					</div>
 				</div>
 
-				<div class="message-buttons {{showMic}} {{showSend}}">
-					<div class="mic">
-						<i class="icon-mic" aria-label="{{_ "Record"}}"></i>
+				{{# if livechatFeatures }}
+					<div class="message-buttons {{showMic}} {{showSend}}">
+						<div class="mic">
+							<i class="icon-mic" aria-label="{{_ "Record"}}"></i>
+						</div>
+						<div class="stop-mic hidden">
+							<i class="icon-stop" aria-label="{{_ "Stop_Recording"}}"></i>
+						</div>
+						<div class="send-button">
+							<i class="icon-paper-plane" aria-label="{{_ "Send"}}"></i>
+						</div>
 					</div>
-					<div class="stop-mic hidden">
-						<i class="icon-stop" aria-label="{{_ "Stop_Recording"}}"></i>
+					<div class="message-buttons {{showVRec}}">
+						<div class="video-button">
+							<i class="icon-videocam" aria-label="{{_ "Record"}}"></i>
+						</div>
 					</div>
-					<div class="send-button">
-						<i class="icon-paper-plane" aria-label="{{_ "Send"}}"></i>
-					</div>
-				</div>
-				<div class="message-buttons {{showVRec}}">
-					<div class="video-button">
-						<i class="icon-videocam" aria-label="{{_ "Record"}}"></i>
-					</div>
-				</div>
+				{{/if }}
 			</div>
 			<div class="users-typing">
 				{{#with usersTyping}}
