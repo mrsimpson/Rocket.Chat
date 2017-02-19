@@ -40,8 +40,6 @@ Package.onUse(function(api) {
 	api.addFiles('lib/fileUpload.coffee', 'client');
 	api.addFiles('lib/fireEvent.js', 'client');
 	api.addFiles('lib/iframeCommands.js', 'client');
-	api.addFiles('lib/jquery.swipebox.min.js', 'client');
-	api.addFiles('lib/jquery.swipebox.init.js', 'client');
 	api.addFiles('lib/menu.coffee', 'client');
 	api.addFiles('lib/modal.coffee', 'client');
 	api.addFiles('lib/Modernizr.js', 'client');
@@ -55,6 +53,8 @@ Package.onUse(function(api) {
 	api.addFiles('lib/sideNav.coffee', 'client');
 	api.addFiles('lib/tapi18n.coffee', 'client');
 	api.addFiles('lib/textarea-autogrow.js', 'client');
+
+	api.addFiles('lib/codeMirror/codeMirror.js', 'client');
 
 	// LIB CORDOVA
 	api.addFiles('lib/cordova/facebook-login.coffee', 'client');
@@ -88,10 +88,9 @@ Package.onUse(function(api) {
 	api.addFiles('views/app/roomSearch.html', 'client');
 	api.addFiles('views/app/secretURL.html', 'client');
 	api.addFiles('views/app/userSearch.html', 'client');
-	api.addFiles('views/app/spotlight/spotlight.html', 'client');
-	api.addFiles('views/app/spotlight/spotlightTemplate.html', 'client');
 	api.addFiles('views/app/videoCall/videoButtons.html', 'client');
 	api.addFiles('views/app/videoCall/videoCall.html', 'client');
+	api.addFiles('views/app/photoswipe.html', 'client');
 
 	api.addFiles('views/cmsPage.coffee', 'client');
 	api.addFiles('views/fxos.coffee', 'client');
@@ -99,13 +98,12 @@ Package.onUse(function(api) {
 	api.addFiles('views/404/roomNotFound.coffee', 'client');
 	api.addFiles('views/app/burger.coffee', 'client');
 	api.addFiles('views/app/home.coffee', 'client');
+	api.addFiles('views/app/mobileMessageMenu.js', 'client');
 	api.addFiles('views/app/privateHistory.coffee', 'client');
 	api.addFiles('views/app/room.coffee', 'client');
 	api.addFiles('views/app/roomSearch.coffee', 'client');
 	api.addFiles('views/app/secretURL.coffee', 'client');
-	api.addFiles('views/app/spotlight/mobileMessageMenu.coffee', 'client');
-	api.addFiles('views/app/spotlight/spotlight.coffee', 'client');
-	api.addFiles('views/app/spotlight/spotlightTemplate.js', 'client');
 	api.addFiles('views/app/videoCall/videoButtons.coffee', 'client');
 	api.addFiles('views/app/videoCall/videoCall.coffee', 'client');
+	api.addFiles('views/app/photoswipe.js', 'client');
 });

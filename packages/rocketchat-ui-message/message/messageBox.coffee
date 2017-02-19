@@ -1,4 +1,6 @@
 import toastr from 'toastr'
+import mime from 'mime-type/with-db'
+
 katexSyntax = ->
 	if RocketChat.katex.katex_enabled()
 		return "$$KaTeX$$"   if RocketChat.katex.dollar_syntax_enabled()
@@ -40,10 +42,17 @@ Template.messageBox.helpers
 
 		roomData = Session.get('roomData' + this._id)
 		if roomData?.t is 'd'
-			if ChatSubscription.findOne({ rid: this._id }, { fields: { archived: 1 } })?.archived
+			subscription = ChatSubscription.findOne({ rid: this._id }, { fields: { archived: 1, blocked: 1, blocker: 1 } })
+			if subscription and (subscription.archived or subscription.blocked or subscription.blocker)
 				return false
 
 		return true
+	isBlockedOrBlocker: ->
+		roomData = Session.get('roomData' + this._id)
+		if roomData?.t is 'd'
+			subscription = ChatSubscription.findOne({ rid: this._id }, { fields: { blocked: 1, blocker: 1 } })
+			if subscription and (subscription.blocked or subscription.blocker)
+				return true
 
 	getPopupConfig: ->
 		template = Template.instance()
@@ -158,8 +167,10 @@ Template.messageBox.events
 					file: item.getAsFile()
 					name: 'Clipboard'
 
-		if files.length > 0
+		if files.length
 			fileUpload files
+		else
+			instance.isMessageFieldEmpty.set(false)
 
 	'keydown .input-message': (event) ->
 		chatMessages[@_id].keydown(@_id, event, Template.instance())
@@ -185,6 +196,8 @@ Template.messageBox.events
 
 		filesToUpload = []
 		for file in files
+			# `file.type = mime.lookup(file.name)` does not work.
+			Object.defineProperty(file, 'type', { value: mime.lookup(file.name) })
 			filesToUpload.push
 				file: file
 				name: file.name

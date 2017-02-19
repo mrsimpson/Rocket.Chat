@@ -1,43 +1,43 @@
 <template name="listCombinedFlex">
-	<header>
+	<header class="primary-background-color">
 		<div>
 			<h4>{{_ "Channels"}}</h4>
 		</div>
 	</header>
-	<div class="content">
+	<div class="content primary-background-color">
 		<div class="wrapper">
 			<div class="flex-control">
 				<div class="search">
 					<form class="search-form" role="form">
 						<div class="input-line search">
 							<select class="c-select" id="show">
-								<option value="joined" selected="{{showSelected 'joined'}}">{{_ "Joined"}}</option>
-								<option value="all" selected="{{showSelected 'all'}}">{{_ "All"}}</option>
+								<option value="joined" selected="{{showSelected 'joined'}}" class="primary-background-color">{{_ "Joined"}}</option>
+								<option value="all" selected="{{showSelected 'all'}}" class="primary-background-color">{{_ "All"}}</option>
 							</select>
-							<i class="icon-comment"></i>
+							<i class="icon-comment secondary-font-color"></i>
 						</div>
 						<div class="input-line search">
 							<select class="c-select" id="sort-channels">
-								<option value="name" selected="{{sortChannelsSelected 'name'}}">{{_ "Name"}}</option>
-								<option value="msgs" selected="{{sortChannelsSelected 'msgs'}}">{{_ "Number_of_messages"}}</option>
+								<option value="name" selected="{{sortChannelsSelected 'name'}}" class="primary-background-color">{{_ "Name"}}</option>
+								<option value="msgs" selected="{{sortChannelsSelected 'msgs'}}" class="primary-background-color">{{_ "Number_of_messages"}}</option>
 							</select>
 							<select class="c-select" id="sort-subscriptions" style="display: none">
-								<option value="name" selected="{{sortSubscriptionsSelected 'name'}}">{{_ "Name"}}</option>
-								<option value="ls" selected="{{sortSubscriptionsSelected 'ls'}}">{{_ "Last_seen"}}</option>
+								<option value="name" selected="{{sortSubscriptionsSelected 'name'}}" class="primary-background-color">{{_ "Name"}}</option>
+								<option value="ls" selected="{{sortSubscriptionsSelected 'ls'}}" class="primary-background-color">{{_ "Last_seen"}}</option>
 							</select>
-							<i class="icon-sort-alt-up"></i>
+							<i class="icon-sort-alt-up secondary-font-color"></i>
 						</div>
 						<div class="input-line search">
 							<select class="c-select" id="channel-type">
-								<option value="all" selected="{{channelTypeSelected 'all'}}">{{_ "All"}}</option>
-								<option value="public" selected="{{channelTypeSelected 'public'}}">{{_ "Public"}}</option>
-								<option value="private" selected="{{channelTypeSelected 'private'}}">{{_ "Private"}}</option>
+								<option value="all" selected="{{channelTypeSelected 'all'}}" class="primary-background-color">{{_ "All"}}</option>
+								<option value="public" selected="{{channelTypeSelected 'public'}}" class="primary-background-color">{{_ "Public"}}</option>
+								<option value="private" selected="{{channelTypeSelected 'private'}}" class="primary-background-color">{{_ "Private"}}</option>
 							</select>
-							<i class="icon-lock"></i>
+							<i class="icon-lock secondary-font-color"></i>
 						</div>
 						<div class="input-line search">
-							<input type="text" id="channel-search" class="search" placeholder="{{_ "Search_Channels"}}" autocomplete="off" />
-							<i class="icon-right-open-small"></i>
+							<input type="text" id="channel-search" class="search" placeholder="{{_ "Search"}}" autocomplete="off" />
+							<i class="icon-search secondary-font-color"></i>
 						</div>
 					</form>
 				</div>
@@ -68,11 +68,4 @@
 			{{/if}}
 		</div>
 	</div>
-	<footer>
-		<div>
-		{{#if canCreate}}
-			<button class="button primary create">{{_ "Create_new"}}</button>
-		{{/if}}
-		</div>
-	</footer>
 </template>

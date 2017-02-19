@@ -16,23 +16,23 @@ Template.membersList.helpers
 
 	roomUsers: ->
 		onlineUsers = RoomManager.onlineUsers.get()
+		roomUsernames = Template.instance().users.get()
 		room = ChatRoom.findOne(this.rid)
-		roomUsernames = room?.usernames or []
-		roomOnlineUsernames = roomUsernames.filter((username) -> onlineUsers[username])
 		roomMuted = room?.muted or []
+		userUtcOffset = Meteor.user().utcOffset
+		totalOnline = 0
+		users = roomUsernames.map (username) ->
+			if onlineUsers[username]?
+				totalOnline++
+				utcOffset = onlineUsers[username].utcOffset
 
-		if Template.instance().showAllUsers.get()
-			usernames = roomUsernames
-		else
-			usernames = roomOnlineUsernames
-
-		users = usernames.map (username) ->
-			utcOffset = onlineUsers[username]?.utcOffset
-
-			if utcOffset?
-				if utcOffset > 0
-					utcOffset = "+#{utcOffset}"
-				utcOffset = "(UTC #{utcOffset})"
+				if utcOffset?
+					if utcOffset is userUtcOffset
+						utcOffset = ""
+					else if utcOffset > 0
+						utcOffset = "+#{utcOffset}"
+					else
+						utcOffset = "(UTC #{utcOffset})"
 
 			return {
 				username: username
@@ -50,14 +50,13 @@ Template.membersList.helpers
 		hasMore = users.length > usersLimit
 		users = _.first(users, usersLimit)
 
-		totalUsers = roomUsernames.length
 		totalShowing = users.length
-		totalOnline = roomOnlineUsernames.length
 
 		ret =
 			_id: this.rid
-			total: totalUsers
+			total: Template.instance().total.get()
 			totalShowing: totalShowing
+			loading: Template.instance().loading.get()
 			totalOnline: totalOnline
 			users: users
 			hasMore: hasMore
@@ -66,7 +65,10 @@ Template.membersList.helpers
 	canAddUser: ->
 		roomData = Session.get('roomData' + this._id)
 		return '' unless roomData
-		return roomData.t in ['p', 'c'] and RocketChat.authz.hasAllPermission('add-user-to-room', this._id)
+		return switch roomData.t
+			when 'p' then RocketChat.authz.hasAtLeastOnePermission ['add-user-to-any-p-room', 'add-user-to-joined-room'], this._id
+			when 'c' then RocketChat.authz.hasAtLeastOnePermission ['add-user-to-any-c-room', 'add-user-to-joined-room'], this._id
+			else false
 
 	autocompleteSettingsAddUser: ->
 		return {
@@ -98,6 +100,7 @@ Template.membersList.helpers
 		room = ChatRoom.findOne(this.rid, { fields: { t: 1 } })
 
 		return {
+			tabBar: Template.currentData().tabBar
 			username: Template.instance().userDetail.get()
 			clear: Template.instance().clearUserDetail
 			showAll: room?.t in ['c', 'p']
@@ -132,6 +135,21 @@ Template.membersList.onCreated ->
 	@usersLimit = new ReactiveVar 100
 	@userDetail = new ReactiveVar
 	@showDetail = new ReactiveVar false
+
+	@users = new ReactiveVar []
+	@total = new ReactiveVar
+	@loading = new ReactiveVar true
+
+	@tabBar = Template.instance().tabBar
+
+	Tracker.autorun =>
+		return unless this.data.rid?
+
+		@loading.set true
+		Meteor.call 'getUsersOfRoom', this.data.rid, this.showAllUsers.get(), (error, users) =>
+			@users.set users.records
+			@total.set users.total
+			@loading.set false
 
 	@clearUserDetail = =>
 		@showDetail.set(false)

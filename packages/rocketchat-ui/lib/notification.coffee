@@ -19,12 +19,20 @@
 					body: _.stripTags(message.msg)
 					tag: notification.payload._id,
 					silent: true
+					canReply: true
 
 				notificationDuration = (notification.duration - 0) or (Meteor.user()?.settings?.preferences?.desktopNotificationDuration - 0) or RocketChat.settings.get('Desktop_Notifications_Duration')
 				if notificationDuration > 0
 					setTimeout ( -> n.close() ), notificationDuration * 1000
 
 				if notification.payload?.rid?
+					if n.addEventListener?
+						n.addEventListener 'reply', ({response}) ->
+							Meteor.call 'sendMessage',
+								_id: Random.id()
+								rid: notification.payload.rid
+								msg: response
+
 					n.onclick = ->
 						this.close()
 						window.focus()
@@ -47,9 +55,15 @@
 			notification.icon = avatarAsPng
 			KonchatNotification.notify(notification)
 
-	newMessage: ->
-		if not Session.equals('user_' + Meteor.userId() + '_status', 'busy') and Meteor.user()?.settings?.preferences?.newMessageNotification isnt false
-			$('#chatAudioNotification')[0].play()
+	newMessage: (rid) ->
+		if not Session.equals('user_' + Meteor.userId() + '_status', 'busy')
+			newMessageNotification = Meteor.user()?.settings?.preferences?.newMessageNotification || 'chime'
+			sub = ChatSubscription.findOne({ rid: rid }, { fields: { audioNotification: 1 } });
+			if sub?.audioNotification isnt 'none'
+				if sub?.audioNotification
+					$("audio##{sub.audioNotification}")?[0]?.play?()
+				else if newMessageNotification isnt 'none'
+					$("audio##{newMessageNotification}")?[0]?.play?()
 
 	newRoom: (rid, withSound = true) ->
 		Tracker.nonreactive ->
@@ -70,12 +84,11 @@
 		$('.link-room-' + rid).removeClass('new-room-highlight')
 
 Tracker.autorun ->
+	newRoomNotification = Meteor.user()?.settings?.preferences?.newRoomNotification || 'door'
 	if Session.get('newRoomSound')?.length > 0
 		Tracker.nonreactive ->
-			if not Session.equals('user_' + Meteor.userId() + '_status', 'busy') and Meteor.user()?.settings?.preferences?.newRoomNotification isnt false
-				$('#chatNewRoomNotification').each ->
-					this.play?()
+			if not Session.equals('user_' + Meteor.userId() + '_status', 'busy') and newRoomNotification isnt 'none'
+				$("audio##{newRoomNotification}")?[0]?.play?()
 	else
-		$('#chatNewRoomNotification').each ->
-			this.pause?()
-			this.currentTime = 0
+		$("audio##{newRoomNotification}")?[0]?.pause?()
+		$("audio##{newRoomNotification}")?[0]?.currentTime = 0

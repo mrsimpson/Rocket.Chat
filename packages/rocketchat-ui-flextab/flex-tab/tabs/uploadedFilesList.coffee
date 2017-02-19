@@ -18,7 +18,7 @@ Template.uploadedFilesList.helpers
 
 	customClassForFileType: ->
 		if @type.match(/^image\/.+$/)
-			return 'room-files-swipebox'
+			return 'room-files-image'
 
 	escapedName: ->
 		return s.escapeHTML @name
@@ -30,6 +30,9 @@ Template.uploadedFilesList.helpers
 		return '/file-upload/' + @_id + '/' + @name
 
 	fixCordova: (url) ->
+		if url?.indexOf('data:image') is 0
+			return url
+
 		if Meteor.isCordova and url?[0] is '/'
 			url = Meteor.absoluteUrl().replace(/\/$/, '') + url
 			query = "rc_uid=#{Meteor.userId()}&rc_token=#{Meteor._localStorage.getItem('Meteor.loginToken')}"
@@ -40,6 +43,8 @@ Template.uploadedFilesList.helpers
 
 		if Meteor.settings.public.sandstorm or url.match /^(https?:)?\/\//i
 			return url
+		else if navigator.userAgent.indexOf('Electron') > -1
+			return __meteor_runtime_config__.ROOT_URL_PATH_PREFIX + url
 		else
 			return Meteor.absoluteUrl().replace(/\/$/, '') + __meteor_runtime_config__.ROOT_URL_PATH_PREFIX + url
 
@@ -91,8 +96,3 @@ Template.uploadedFilesList.onCreated ->
 		@subscribe 'roomFiles', rid, @limit.get(), =>
 			if roomFiles.find({ rid: rid }).fetch().length < @limit.get()
 				@hasMore.set false
-
-Template.uploadedFilesList.onRendered ->
-	$('.room-files-swipebox').swipebox({
-		hideBarsDelay: 0
-	})

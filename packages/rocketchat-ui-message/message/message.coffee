@@ -32,8 +32,11 @@ Template.message.helpers
 			return 'temp'
 	body: ->
 		return Template.instance().body
-	system: ->
+	system: (returnClass) ->
 		if RocketChat.MessageTypes.isSystemMessage(this)
+			if returnClass
+				return 'color-info-font-color'
+
 			return 'system'
 	edited: ->
 		return Template.instance().wasEdited
@@ -128,7 +131,6 @@ Template.message.helpers
 	hideReactions: ->
 		return 'hidden' if _.isEmpty(@reactions)
 
-
 	actionLinks: ->
 		# remove 'method_id' and 'params' properties
 		return _.map(@actionLinks, (actionLink, key) -> _.extend({ id: key }, _.omit(actionLink, 'method_id', 'params')))
@@ -194,8 +196,10 @@ Template.message.onViewRendered = (context) ->
 
 		else if previousNode?.dataset?
 			previousDataset = previousNode.dataset
+			previousMessageDate = new Date(parseInt(previousDataset.timestamp))
+			currentMessageDate = new Date(parseInt(currentDataset.timestamp))
 
-			if previousDataset.date isnt currentDataset.date
+			if previousMessageDate.toDateString() isnt currentMessageDate.toDateString()
 				$currentNode.addClass('new-day').removeClass('sequential')
 			else
 				$currentNode.removeClass('new-day')
@@ -230,4 +234,4 @@ Template.message.onViewRendered = (context) ->
 			else
 				if templateInstance?.firstNode && templateInstance?.atBottom is false
 					newMessage = templateInstance?.find(".new-message")
-					newMessage?.className = "new-message"
+					newMessage?.className = "new-message background-primary-action-color color-content-background-color "

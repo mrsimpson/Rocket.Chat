@@ -149,6 +149,11 @@ export class CustomOAuth {
 			let identity = self.getIdentity(accessToken);
 
 			if (identity) {
+				// Set 'id' to '_id' for any sources that provide it
+				if (identity._id && !identity.id) {
+					identity.id = identity._id;
+				}
+
 				// Fix for Reddit
 				if (identity.result) {
 					identity = identity.result;
@@ -224,14 +229,14 @@ export class CustomOAuth {
 		if (this.usernameField.indexOf('#{') > -1) {
 			username = this.usernameField.replace(/#{(.+?)}/g, function(match, field) {
 				if (!data[field]) {
-					throw new Meteor.Error(`Username template item "${field}" not found in data`, data);
+					throw new Meteor.Error('field_not_found', `Username template item "${field}" not found in data`, data);
 				}
 				return data[field];
 			});
 		} else {
 			username = data[this.usernameField];
 			if (!username) {
-				throw new Meteor.Error(`Username field "${this.usernameField}" not found in data`, data);
+				throw new Meteor.Error('field_not_found', `Username field "${this.usernameField}" not found in data`, data);
 			}
 		}
 
@@ -249,6 +254,11 @@ export class CustomOAuth {
 
 				const user = RocketChat.models.Users.findOneByUsername(username);
 				if (!user) {
+					return;
+				}
+
+				// User already created or merged
+				if (user.services && user.services[serviceName] && user.services[serviceName].id === serviceData.id) {
 					return;
 				}
 

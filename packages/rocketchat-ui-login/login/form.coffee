@@ -47,27 +47,12 @@ Template.loginForm.helpers
 	hasOnePassword: ->
 		return OnePassword?.findLoginForUrl? && device?.platform?.toLocaleLowerCase() is 'ios'
 
-	customFields: ->
-		if not Template.instance().customFields.get()
-			return []
-
-		customFieldsArray = []
-		for key, value of Template.instance().customFields.get()
-			if value.hideFromForm is true
-				continue
-
-			customFieldsArray.push
-				fieldName: key,
-				field: value
-
-		return customFieldsArray
-
-
 Template.loginForm.events
 	'submit #login-card': (event, instance) ->
 		event.preventDefault()
 
 		button = $(event.target).find('button.login')
+		button.focus()
 		RocketChat.Button.loading(button)
 
 		formData = instance.validate()
@@ -127,8 +112,9 @@ Template.loginForm.events
 						else
 							toastr.error t 'User_not_found_or_incorrect_password'
 						return
-					localStorage.setItem('userLanguage', Meteor.user()?.language)
-					setLanguage(Meteor.user()?.language)
+					if Meteor.user()?.language?
+						localStorage.setItem('userLanguage', Meteor.user().language)
+						setLanguage(Meteor.user().language)
 
 	'click .register': ->
 		Template.instance().state.set 'register'
