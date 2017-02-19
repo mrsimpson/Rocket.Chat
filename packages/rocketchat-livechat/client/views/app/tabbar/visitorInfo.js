@@ -1,3 +1,6 @@
+import moment from 'moment';
+import UAParser from 'ua-parser-js';
+
 Template.visitorInfo.helpers({
 	user() {
 		const user = Template.instance().user.get();
@@ -133,9 +136,8 @@ Template.visitorInfo.helpers({
 
 		const data = Template.currentData();
 		if (data && data.rid) {
-			const room = RocketChat.models.Rooms.findOne(data.rid);
-			const user = Meteor.user();
-			return room.usernames.indexOf(user && user.username) !== -1;
+			const subscription = RocketChat.models.Subscriptions.findOne({ rid: data.rid });
+			return subscription !== undefined;
 		}
 		return false;
 	}

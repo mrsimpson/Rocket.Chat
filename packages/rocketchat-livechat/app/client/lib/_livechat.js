@@ -16,6 +16,23 @@ this.Livechat = new (class Livechat {
 		this._offlineUnavailableMessage = new ReactiveVar('');
 		this._displayOfflineForm = new ReactiveVar(true);
 		this._offlineSuccessMessage = new ReactiveVar(TAPi18n.__('Thanks_We_ll_get_back_to_you_soon'));
+		this._videoCall = new ReactiveVar(false);
+		this._transcriptMessage = new ReactiveVar('');
+		this._connecting = new ReactiveVar(false);
+
+		this._room = new ReactiveVar(null);
+
+		this._department = new ReactiveVar(null);
+
+		this._ready = new ReactiveVar(false);
+
+		Tracker.autorun(() => {
+			if (this._room.get() && Meteor.userId()) {
+				RoomHistoryManager.getMoreIfIsEmpty(this._room.get());
+				visitor.subscribeToRoom(this._room.get());
+				visitor.setRoom(this._room.get());
+			}
+		});
 	}
 
 	get online() {
@@ -50,6 +67,19 @@ this.Livechat = new (class Livechat {
 	}
 	get offlineSuccessMessage() {
 		return this._offlineSuccessMessage.get();
+	}
+	get videoCall() {
+		return this._videoCall.get();
+	}
+	get transcriptMessage() {
+		return this._transcriptMessage.get();
+	}
+	get department() {
+		return this._department.get();
+	}
+
+	get connecting() {
+		return this._connecting.get();
 	}
 
 	set online(value) {
@@ -92,5 +122,32 @@ this.Livechat = new (class Livechat {
 	}
 	set offlineFontColor(value) {
 		this._offlineFontColor.set(value);
+	}
+	set videoCall(value) {
+		this._videoCall.set(value);
+	}
+	set transcriptMessage(value) {
+		this._transcriptMessage.set(value);
+	}
+	set connecting(value) {
+		this._connecting.set(value);
+	}
+	set room(roomId) {
+		this._room.set(roomId);
+	}
+	set department(departmentId) {
+		const dept = Department.findOne({ _id: departmentId }) || Department.findOne({ name: departmentId });
+
+		if (dept) {
+			this._department.set(dept._id);
+		}
+	}
+
+	ready() {
+		this._ready.set(true);
+	}
+
+	isReady() {
+		return this._ready.get();
 	}
 })();
