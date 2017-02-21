@@ -1,10 +1,17 @@
 class RedlinkAdapter {
 	constructor(adapterProps) {
+		console.log("RedlinkAdapter");
 		this.properties = adapterProps;
-		this.headers = {};
-		this.headers['content-Type'] = 'application/json; charset=utf-8';
+		this.properties.url = this.properties.url.toLowerCase();
+
+		this.options = {};
+		this.options.headers={};
+		this.options.headers['content-Type'] = 'application/json; charset=utf-8';
 		if (this.properties.token) {
-			this.headers['authorization'] = 'basic ' + this.properties.token;
+			this.options.headers['authorization'] = 'basic ' + this.properties.token;
+		}
+		if(this.properties.url.substring(0, 4) === 'https'){
+			this.options.cert = '~/.nodeCaCerts/' + this.properties.url.replace('https', '');
 		}
 	}
 
@@ -39,7 +46,6 @@ class RedlinkAdapter {
 		RocketChat.models.Messages.find({
 			rid: rid,
 			_hidden: {$ne: true},
-			msg: {$ne: ""},
 			ts: {$gt: new Date(analyzedUntil)}
 		}).forEach(visibleMessage => {
 			conversation.push({
@@ -54,10 +60,9 @@ class RedlinkAdapter {
 	onResultModified(modifiedRedlinkResult) {
 		try {
 			SystemLogger.debug("sending update to redlinkk with: " + JSON.stringify(modifiedRedlinkResult));
-			const responseRedlinkQuery = HTTP.post(this.properties.url + '/query', {
-				data: modifiedRedlinkResult.result,
-				headers: this.headers
-			});
+			let options = this.options;
+			options.data = modifiedRedlinkResult.result;
+			const responseRedlinkQuery = HTTP.post(this.properties.url + '/query', options);
 			SystemLogger.debug("recieved update to redlinkk with: " + JSON.stringify(responseRedlinkQuery));
 			RocketChat.models.LivechatExternalMessage.update(
 				{
@@ -77,34 +82,38 @@ class RedlinkAdapter {
 		}
 	}
 
-	onMessage(message) {
+	onMessage(message, context = {}) {
 		const knowledgeProviderResultCursor = this.getKnowledgeProviderCursor(message.rid);
 		const latestKnowledgeProviderResult = knowledgeProviderResultCursor.fetch()[0];
 
 		const requestBody = this.createRedlinkStub(message.rid, latestKnowledgeProviderResult);
 		requestBody.messages = this.getConversation(message.rid, latestKnowledgeProviderResult);
 
+		requestBody.context = context;
+
 		try {
-			const responseRedlinkPrepare = HTTP.post(this.properties.url + '/prepare', {
-				data: requestBody,
-				headers: this.headers
-			});
+			let options = this.options;
+			this.options.data = requestBody;
+			const responseRedlinkPrepare = HTTP.post(this.properties.url + '/prepare', options);
 
 			if (responseRedlinkPrepare.data && responseRedlinkPrepare.statusCode === 200) {
 
 				this.purgePreviousResults(knowledgeProviderResultCursor);
 
-				RocketChat.models.LivechatExternalMessage.insert({
+				const externalMessageId = RocketChat.models.LivechatExternalMessage.insert({
 					rid: message.rid,
 					knowledgeProvider: "redlink",
 					originMessage: {_id: message._id, ts: message.ts},
 					result: responseRedlinkPrepare.data,
 					ts: new Date()
 				});
+
+				const externalMessage = RocketChat.models.LivechatExternalMessage.findOneById(externalMessageId);
+
+				Meteor.defer(() => RocketChat.callbacks.run('afterExternalMessage', externalMessage));
 			}
 		} catch (e) {
-			SystemLogger.error('Redlink-Prepare/Query with results from prepare did not succeed -> ', e);
-			SystemLogger.warn("RequestBody: " + JSON.stringify(requestBody));
+			console.error('Redlink-Prepare/Query with results from prepare did not succeed -> ', e);
 		}
 	}
 
@@ -133,18 +142,48 @@ class RedlinkAdapter {
 
 		if (!results) {
 			try {
-				const request = {
-					data: {
-						messages: latestKnowledgeProviderResult.result.messages,
-						tokens: latestKnowledgeProviderResult.result.tokens,
-						queryTemplates: latestKnowledgeProviderResult.result.queryTemplates
-					},
-					headers: this.headers
+
+				let options = this.options;
+				this.options.data = this.options;
+
+				options.data = {
+					messages: latestKnowledgeProviderResult.result.messages,
+					tokens: latestKnowledgeProviderResult.result.tokens,
+					queryTemplates: latestKnowledgeProviderResult.result.queryTemplates,
+					context: latestKnowledgeProviderResult.result.context
 				};
 
-				const responseRedlinkResult = HTTP.post(this.properties.url + '/result/' + creator + '/?templateIdx=' + templateIndex, request);
+				const responseRedlinkResult = HTTP.post(this.properties.url + '/result/' + creator + '/?templateIdx=' + templateIndex, options);
 				if (responseRedlinkResult.data && responseRedlinkResult.statusCode === 200) {
 					results = responseRedlinkResult.data;
+
+					if (creator === 'conversation') {
+						results.forEach(function (result)						{
+							// Some dirty string operations to convert the snippet to javascript objects
+							let transformedSnippet = JSON.stringify(result.snippet);
+							transformedSnippet = transformedSnippet.slice(1, transformedSnippet.length - 1); //remove quotes in the beginning and at the end
+
+							if (transformedSnippet) {
+								transformedSnippet = '[' + transformedSnippet;
+								transformedSnippet = transformedSnippet.replace(/\\n/g, '');
+								transformedSnippet = transformedSnippet.replace(/<div class=\\"message seeker\\">/g, '{"origin": "seeker", "text": "');
+								transformedSnippet = transformedSnippet.replace(/<div class=\\"message provider\\">/g, '{"origin": "provider", "text": "');
+								transformedSnippet = transformedSnippet.replace(/<\/div>/g, '"},');
+								transformedSnippet = transformedSnippet.trim();
+								if (transformedSnippet.endsWith(',')) {
+									transformedSnippet = transformedSnippet.slice(0, transformedSnippet.length - 1);
+								}
+								transformedSnippet = transformedSnippet + ']';
+							}
+							try {
+								const messages = JSON.parse(transformedSnippet);
+								result.messages = messages;
+							} catch(err){
+								console.error('Error parsing conversation',err)
+							}
+						});
+						results.reduce((result)=>!!result.messages);
+					}
 
 					//buffer the results
 					let inlineResultsMap = latestKnowledgeProviderResult.inlineResults || {};
@@ -188,12 +227,10 @@ class RedlinkAdapter {
 		if (latestKnowledgeProviderResult) {
 			latestKnowledgeProviderResult.helpful = room.rbInfo.knowledgeProviderUsage;
 
-			HTTP.post(this.properties.url + '/store', {
-				data: {
-					latestKnowledgeProviderResult
-				},
-				headers: this.headers
-			});
+			let options = this.options;
+			this.options.data = latestKnowledgeProviderResult;
+
+			HTTP.post(this.properties.url + '/store', options);
 		}
 	}
 }
