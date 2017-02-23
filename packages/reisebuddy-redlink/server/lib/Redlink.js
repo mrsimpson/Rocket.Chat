@@ -1,6 +1,5 @@
 class RedlinkAdapter {
 	constructor(adapterProps) {
-		console.log("RedlinkAdapter");
 		this.properties = adapterProps;
 		this.properties.url = this.properties.url.toLowerCase();
 
