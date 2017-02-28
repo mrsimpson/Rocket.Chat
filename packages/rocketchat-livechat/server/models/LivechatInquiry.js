@@ -4,7 +4,7 @@ class LivechatInquiry extends RocketChat.models._Base {
 
 		this.tryEnsureIndex({ 'rid': 1 }); // room id corresponding to this inquiry
 		this.tryEnsureIndex({ 'name': 1 }); // name of the inquiry (client name for now)
-		this.tryEnsureIndex({ 'message': 'text' }); // message sent by the client - Need to be the same as packages/rocketchat-lib/server/models/Messages.coffee:12 (otherwise error on inserting large documents)
+		this.tryEnsureIndex({ 'message': 1 }); // message sent by the client
 		this.tryEnsureIndex({ 'ts': 1 }); // timestamp
 		this.tryEnsureIndex({ 'code': 1 }); // (for routing)
 		this.tryEnsureIndex({ 'agents': 1}); // Id's of the agents who can see the inquiry (handle departments)

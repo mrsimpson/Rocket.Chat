@@ -24,40 +24,40 @@ const fields = {
 };
 
 Meteor.methods({
-		'subscriptions/get'(updatedAt) {
-	if (!Meteor.userId()) {
-		return [];
-}
-
-this.unblock();
-
-const options = {
-	fields: fields
-};
-
-const records = RocketChat.models.Subscriptions.findByUserId(Meteor.userId(), options).fetch();
-
-if (updatedAt instanceof Date) {
-	return {
-		update: records.filter(function(record) {
-	return record._updatedAt > updatedAt;
-	}),
-	remove: RocketChat.models.Subscriptions.trashFindDeletedAfter(updatedAt, {
-		'u._id': Meteor.userId()
-	}, {
-		fields: {
-			_id: 1,
-			_deletedAt: 1
+	'subscriptions/get'(updatedAt) {
+		if (!Meteor.userId()) {
+			return [];
 		}
-	}).fetch()
-	};
-}
-return records;
-}
+
+		this.unblock();
+
+		const options = {
+			fields: fields
+		};
+
+		const records = RocketChat.models.Subscriptions.findByUserId(Meteor.userId(), options).fetch();
+
+		if (updatedAt instanceof Date) {
+			return {
+				update: records.filter(function(record) {
+					return record._updatedAt > updatedAt;
+				}),
+				remove: RocketChat.models.Subscriptions.trashFindDeletedAfter(updatedAt, {
+					'u._id': Meteor.userId()
+				}, {
+					fields: {
+						_id: 1,
+						_deletedAt: 1
+					}
+				}).fetch()
+			};
+		}
+		return records;
+	}
 });
 
 RocketChat.models.Subscriptions.on('changed', function(type, subscription) {
-return RocketChat.Notifications.notifyUserInThisInstance(subscription.u._id, 'subscriptions-changed', type, RocketChat.models.Subscriptions.processQueryOptionsOnResult(subscription, {
-	fields: fields
-}));
+	return RocketChat.Notifications.notifyUserInThisInstance(subscription.u._id, 'subscriptions-changed', type, RocketChat.models.Subscriptions.processQueryOptionsOnResult(subscription, {
+		fields: fields
+	}));
 });
