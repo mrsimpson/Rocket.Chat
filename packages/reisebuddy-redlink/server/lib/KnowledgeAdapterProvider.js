@@ -15,24 +15,24 @@ _dbs.getKnowledgeAdapter = function () {
 	};
 
 	switch (knowledgeSource) {
-		case KNOWLEDGE_SRC_APIAI:
-			adapterProps.url = 'https://api.api.ai/api/query?v=20150910';
+	case KNOWLEDGE_SRC_APIAI:
+		adapterProps.url = 'https://api.api.ai/api/query?v=20150910';
 
-			RocketChat.settings.get('Livechat_Knowledge_Apiai_Key', function (key, value) {
-				adapterProps.token = value;
-			});
-			RocketChat.settings.get('Livechat_Knowledge_Apiai_Language', function (key, value) {
-				adapterProps.language = value;
-			});
+		RocketChat.settings.get('Livechat_Knowledge_Apiai_Key', function (key, value) {
+			adapterProps.token = value;
+		});
+		RocketChat.settings.get('Livechat_Knowledge_Apiai_Language', function (key, value) {
+			adapterProps.language = value;
+		});
 
-			if (!_dbs.apiaiAdapter) {
-				_dbs.apiaiAdapter = new _dbs.ApiAiAdapterClass(adapterProps);
-			}
-			return _dbs.apiaiAdapter;
-			break;
-		case KNOWLEDGE_SRC_REDLINK:
-			return _dbs.RedlinkAdapterFactory.getInstance(); // buffering done inside the factory method
-			break;
+		if (!_dbs.apiaiAdapter) {
+			_dbs.apiaiAdapter = new _dbs.ApiAiAdapterClass(adapterProps);
+		}
+		return _dbs.apiaiAdapter;
+		break;
+	case KNOWLEDGE_SRC_REDLINK:
+		return _dbs.RedlinkAdapterFactory.getInstance(); // buffering done inside the factory method
+		break;
 	}
 };
 

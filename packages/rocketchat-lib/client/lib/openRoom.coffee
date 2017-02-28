@@ -75,7 +75,7 @@ currentTracker = undefined
 # RB: For closed rooms: Don't re-open it once the room is being displayed (e. g. from administration-view)
 			sub = ChatSubscription.findOne({rid: room._id})
 			if sub?.open is false
-				Meteor.call 'openRoom', room._id, room.open, (err) ->
+				Meteor.call 'openRoom', room._id, (err) ->
 					if err
 						return handleError(err)
 # /RB

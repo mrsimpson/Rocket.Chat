@@ -160,19 +160,16 @@ class ModelSubscriptions extends RocketChat.models._Base
 
 		return @update query, update
 
-# RB: For closed rooms: Don't re-open it once the room is being displayed (e. g. from administration-view)
-	openByRoomIdAndUserId: (roomId, userId, markAsOpen = true) ->
+	openByRoomIdAndUserId: (roomId, userId) ->
 		query =
 			rid: roomId
 			'u._id': userId
 
-
 		update =
 			$set:
-				open: markAsOpen
+				open: true
 
 		return @update query, update
-# /RB
 
 	setAsReadByRoomIdAndUserId: (roomId, userId) ->
 		query =

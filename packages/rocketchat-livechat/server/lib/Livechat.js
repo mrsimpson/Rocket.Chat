@@ -80,10 +80,7 @@ RocketChat.Livechat = {
 		// return messages;
 		return _.extend(RocketChat.sendMessage(guest, message, room), { newRoom: newRoom, showConnecting: this.showConnecting() });
 	},
-
-//	RB: extend signature to allow propagation of further user characteristics on joining a room(e. g. the CRM ID)
-	registerGuest({ token, name, email, department, phone, loginToken, username, other } = {}) {
-//	RB
+	registerGuest({ token, name, email, department, phone, loginToken, username } = {}) {
 		check(token, String);
 
 		let userId;

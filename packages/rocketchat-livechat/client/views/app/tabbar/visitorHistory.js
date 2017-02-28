@@ -1,6 +1,10 @@
 import moment from 'moment';
 
 Template.visitorHistory.helpers({
+	historyLoaded() {
+		return !Template.instance().loadHistory.ready();
+	},
+
 	previousChats() {
 		return ChatRoom.find({
 			_id: { $ne: this.rid },
@@ -15,9 +19,7 @@ Template.visitorHistory.helpers({
 	title() {
 		let title = moment(this.ts).format('L LTS');
 
-		if (this.topic && this.topic.length) {
-			title += ' - ' + this.topic;
-		} else if (this.label) {
+		if (this.label) {
 			title += ' - ' + this.label;
 		}
 
@@ -31,12 +33,10 @@ Template.visitorHistory.onCreated(function() {
 
 	this.autorun(() => {
 		const room = ChatRoom.findOne({ _id: Template.currentData().rid });
-		if (room && room.v && room.v._id) {
-			this.visitorId.set(room.v._id);
-		}
+		this.visitorId.set(room.v._id);
 	});
 
 	if (currentData && currentData.rid) {
-		this.subscribe('livechat:visitorHistory', { rid: currentData.rid });
+		this.loadHistory = this.subscribe('livechat:visitorHistory', { rid: currentData.rid });
 	}
 });

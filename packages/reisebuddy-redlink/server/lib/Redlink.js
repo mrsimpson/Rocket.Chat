@@ -136,6 +136,7 @@ class RedlinkAdapter {
 		};
 
 		const _getBufferedResults = function (latestKnowledgeProviderResult, templateIndex, creator) {
+
 			if (latestKnowledgeProviderResult && latestKnowledgeProviderResult.knowledgeProvider === 'redlink' && latestKnowledgeProviderResult.inlineResults) {
 				return latestKnowledgeProviderResult.inlineResults[_getKeyForBuffer(templateIndex, creator)];
 			}
@@ -148,24 +149,10 @@ class RedlinkAdapter {
 		 * @private
 		 */
 		const _preprocessTemplates = function(queryTemplates){
-			queryTemplates.filter((template) => template.queryType === "Sonstiges")
-				.forEach((template)=>template.queries
-					.forEach((query)=>{switch (query.creator) {
-						case 'Konversationen':
-							query.creator = 'Hasso-MLT';
-							break;
-					}
-					}));
 			return queryTemplates;
 		};
 
 		const _postprocessResultResponse = function(results){
-			results.forEach((result)=>{
-				switch (result.creator){
-					case 'Hasso-MLT':
-						result.creator = 'Konversationen';
-				}
-			});
 			return results;
 		};
 
@@ -188,11 +175,11 @@ class RedlinkAdapter {
 				this.options.data = this.options;
 
 				options.data = {
-					messages: latestKnowledgeProviderResult.result.messages,
-					tokens: latestKnowledgeProviderResult.result.tokens,
-					queryTemplates: _preprocessTemplates(latestKnowledgeProviderResult.result.queryTemplates),
-					context: latestKnowledgeProviderResult.result.context
-				};
+						messages: latestKnowledgeProviderResult.result.messagescl,
+						tokens: latestKnowledgeProviderResult.result.tokens,
+						queryTemplates: _preprocessTemplates(latestKnowledgeProviderResult.result.queryTemplates),
+						context: latestKnowledgeProviderResult.result.context
+					};
 
 
 				const responseRedlinkResult = HTTP.post(this.properties.url + '/result/' + creator + '/?templateIdx=' + templateIndex, options);
@@ -222,10 +209,11 @@ class RedlinkAdapter {
 								result.messages = messages;
 							} catch(err){
 								console.error('Error parsing conversation',err)
-							}
+								}
 						});
 						results.reduce((result)=>!!result.messages);
 					}
+
 					results = _postprocessResultResponse(results);
 
 					//buffer the results

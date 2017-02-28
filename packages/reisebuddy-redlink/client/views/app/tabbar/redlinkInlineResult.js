@@ -1,9 +1,6 @@
-Template.redlinkInlineResult._copyReplySuggestion = function(event, instance)
-{
+Template.redlinkInlineResult._copyReplySuggestion = function (event, instance) {
 	if (instance.data.result.replySuggestion) {
-		const inputBox = $('#chat-window-' + instance.data.roomId + ' .input-message');
-		const initialInputBoxValue = inputBox.val() ? inputBox.val() + ' ' : '';
-		inputBox.val(initialInputBoxValue + instance.data.result.replySuggestion).focus().trigger('keyup');
+		$('#chat-window-' + instance.data.roomId + ' .input-message').val(instance.data.result.replySuggestion);
 	}
 };
 
@@ -23,7 +20,11 @@ Template.redlinkInlineResult.helpers({
 				templateSuffix = "VKL_community";
 				break;
 			default:
-				templateSuffix = "generic";
+				if (!!Template['redlinkInlineResult_' + instance.data.result.creator]) {
+					templateSuffix = instance.data.result.creator;
+				} else {
+					templateSuffix = "generic";
+				}
 				break;
 		}
 		return 'redlinkInlineResult_' + templateSuffix;
@@ -61,14 +62,14 @@ Template.redlinkInlineResult_generic.helpers({
 //------------------------------------- Bahn.de -----------------------------------------------
 
 Template.redlinkInlineResult_bahn_de.events({
-	'click .js-copy-reply-suggestion': function(event, instance){
+	'click .js-copy-reply-suggestion': function (event, instance) {
 		return Template.redlinkInlineResult._copyReplySuggestion(event, instance)
 	}
 });
 
 Template.redlinkInlineResult_bahn_de.helpers({
 	durationformat(val){
-		return new _dbs.Duration(val * 60*1000).toHHMMSS();
+		return new _dbs.Duration(val * 60 * 1000).toHHMMSS();
 	}
 });
 
