@@ -38,7 +38,7 @@ Package.onUse(function (api) {
 	//i18n
 	const _ = Npm.require('underscore');
 	const fs = Npm.require('fs');
-	var tapi18nFiles = _.compact(_.map(fs.readdirSync('packages/dbs-ai/i18n'), function(filename) {
+	var tapi18nFiles = _.compact(_.map(fs.readdirSync('packages/reisebuddy-redlink/i18n'), function(filename) {
 		if (fs.statSync('packages/reisebuddy-redlink/i18n/' + filename).size > 16) {
 			return 'i18n/' + filename;
 		}

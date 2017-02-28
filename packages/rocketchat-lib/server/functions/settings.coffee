@@ -19,7 +19,7 @@ RocketChat.settings.add = (_id, value, options = {}) ->
 
 	if not _id or
 		not value? and not process?.env?['OVERWRITE_SETTING_' + _id]?
-		return false
+			return false
 
 	RocketChat.settings._sorter[options.group] ?= 0
 

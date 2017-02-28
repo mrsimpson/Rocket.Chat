@@ -91,15 +91,6 @@ class RedlinkAdapter {
 		 * @private
 		 */
 		const _postprocessPrepare = function(prepareResponse){
-			prepareResponse.queryTemplates.filter((template) => template.queryType === "Sonstiges")
-				.forEach((template)=>template.queries
-					.forEach((query)=>{switch (query.creator) {
-						case 'Hasso-MLT':
-							query.creator = 'Konversationen';
-							query.displayTitle = 'Ähnliches';
-							break;
-					}
-					}));
 			return prepareResponse;
 		};
 
@@ -203,14 +194,6 @@ class RedlinkAdapter {
 					context: latestKnowledgeProviderResult.result.context
 				};
 
-				//adapt creator
-				switch (creator){
-					case 'Konversationen':
-						creator = 'Hasso-MLT';
-						break;
-				}
-
-
 
 				const responseRedlinkResult = HTTP.post(this.properties.url + '/result/' + creator + '/?templateIdx=' + templateIndex, options);
 				if (responseRedlinkResult.data && responseRedlinkResult.statusCode === 200) {
@@ -244,13 +227,6 @@ class RedlinkAdapter {
 						results.reduce((result)=>!!result.messages);
 					}
 					results = _postprocessResultResponse(results);
-
-					//adapt creator
-					switch (creator){
-						case 'Hasso-MLT':
-							creator = 'Konversationen';
-							break;
-					};
 
 					//buffer the results
 					let inlineResultsMap = latestKnowledgeProviderResult.inlineResults || {};
