@@ -49,11 +49,6 @@ currentTracker = undefined
 				if roomDom.classList.contains('room-container')
 					roomDom.querySelector('.messages-box > .wrapper').scrollTop = roomDom.oldScrollTop
 
-#  RB: Disable input-field for closed livechat-rooms
-			if room.t == 'l' && !room.open
-				$('.input-message').attr('disabled', true)
-# /RB
-
 			Session.set 'openedRoom', room._id
 
 			fireGlobalEvent 'room-opened', _.omit room, 'usernames'
@@ -71,14 +66,11 @@ currentTracker = undefined
 				, 100
 
 			# update user's room subscription
-
-# RB: For closed rooms: Don't re-open it once the room is being displayed (e. g. from administration-view)
 			sub = ChatSubscription.findOne({rid: room._id})
 			if sub?.open is false
 				Meteor.call 'openRoom', room._id, (err) ->
 					if err
 						return handleError(err)
-# /RB
 
 			if FlowRouter.getQueryParam('msg')
 				msg = { _id: FlowRouter.getQueryParam('msg'), rid: room._id }

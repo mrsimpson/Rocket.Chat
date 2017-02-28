@@ -3,6 +3,12 @@
         <div class="title">
             <h2><span class="title-icon"><img src="/packages/reisebuddy_livechat/assets/icons/buld-grey.png"></span>{{_ "Knowledge_Base"}}</h2>
         </div>
+<!--		{{#let helpRequest=helpRequestByRoom }}
+			{{#if helpRequest}}
+				{{> HelpRequestContext helpRequest }}
+				{{> HelpRequestActions helpRequest }}
+			{{/if}}
+		{{/let}}-->
 		{{#each messages}}
 			{{#if result}}
                 <div class="external-message">
@@ -34,11 +40,27 @@
         <div class="knowledge-title">{{queryType}}</div>
         <div class="knowledge-informations-wrapper">
 			{{#each filledQuerySlots }}
-                <div class="knowledge-base-label">{{role}}</div>
-                <div class="knowledge-base-value">{{clientValue}}</div>
+				<div>
+                <span class="knowledge-base-label">{{role}}</span>
+                <span class="knowledge-base-value">{{clientValue}}</span>
+				</div>
 			{{/each}}
         </div>
     </div>
+</template>
+
+<template name="dynamic_redlink_Sonstiges">
+	<div class="query-template">
+		<div class="knowledge-title">{{text 'help'}}</div>
+		<div class="knowledge-informations-wrapper">
+			{{#each filledQuerySlots }}
+				<div>
+					<span class="knowledge-base-label">{{role}}</span>
+					<span class="knowledge-base-value">{{clientValue}}</span>
+				</div>
+			{{/each}}
+		</div>
+	</div>
 </template>
 
 <template name="dynamic_redlink_Produkt">
@@ -108,7 +130,8 @@
 </template>
 
 <template name="dynamic_tpl_redlinkItem">
-    <div class="field-with-label" data-token-type="{{tokenType}}" data-slot-role="{{role}}" data-parent-tpl-index="{{parentTplIndex}}"
+    <div class="field-with-label" data-token-type="{{tokenType}}" data-slot-role="{{role}}"
+         data-parent-tpl-index="{{parentTplIndex}}"
          data-token-index="{{tokenIndex}}">
         <label for="{{htmlId}}" class="knowledge-base-label">{{_ label}}</label>
         <div class="knowledge-input-wrapper">
@@ -123,5 +146,15 @@
             <div class="edit-icons-set"><span class="icon-cancel"></span><span class="icon-floppy"></span>
             </div>
         </div>
+    </div>
+</template>
+
+<template name="dynamic_redlink_ApplicationHelp">
+    <div class="query-template">
+        <div class="knowledge-title">{{text queryType}}</div>
+        <!--<div class="value-line-wrapper">-->
+			<!--{{>dynamic_tpl_redlinkItem (forItem 'supportType') }}-->
+			<!--{{>dynamic_tpl_redlinkItem (forItem 'keyword') }}-->
+        <!--</div>-->
     </div>
 </template>

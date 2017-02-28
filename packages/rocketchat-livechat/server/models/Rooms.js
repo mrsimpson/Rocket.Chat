@@ -145,14 +145,11 @@ RocketChat.models.Rooms.closeByRoomId = function(roomId, closeInfo) {
 				username: closeInfo.user.username
 			},
 			closedAt: closeInfo.closedAt,
-			chatDuration: closeInfo.chatDuration,
-			// RB: Classify room as closed (instead of "undefined" in the Rocket.Chat default implementation) (needed for correct displaying)
-			open: false
-			// RB
+			chatDuration: closeInfo.chatDuration
+		},
+		$unset: {
+			open: 1
 		}
-// RB: Classify room as closed (instead of "undefined" in the Rocket.Chat default implementation)
-// 		in order to allow to copy this information (e. g. when displaying a livechat-room)
-// RB
 	});
 };
 

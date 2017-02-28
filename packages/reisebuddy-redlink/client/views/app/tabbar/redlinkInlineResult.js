@@ -97,4 +97,52 @@ Template.redlinkInlineResult_VKL_community.onCreated(function () {
 	});
 });
 
+//-------------------------------------- Assistify --------------------------------
+Template.redlinkInlineResult_conversation.helpers({
+	classExpanded(){
+		const instance = Template.instance();
+		return instance.state.get('expanded') ? 'expanded' : 'collapsed';
+	},
+	originQuestion(){
+		const instance = Template.instance();
+		return instance.data.result.messages[0].text;
+	},
+	latestResponse(){
+		const instance = Template.instance();
+		return instance.data.result.messages.filter((message)=>message.origin === 'provider').pop().text;
+	},
 
+	subsequentCommunication(){
+		const instance = Template.instance();
+		return instance.data.result.messages.slice(1);
+	}
+});
+
+Template.redlinkInlineResult_conversation.events({
+	'click .result-item-wrapper .js-toggle-result-preview-expanded': function (event, instance) {
+		const current = instance.state.get('expanded');
+		instance.state.set('expanded', !current);
+	}
+});
+
+Template.redlinkInlineResult_conversation.onCreated(function () {
+	const instance = this;
+
+	let transformedSnippet = instance.data.result.snippet;
+
+	this.state = new ReactiveDict();
+	this.state.setDefault({
+		expanded: false
+	});
+});
+
+
+// Template.redlinkInlineResult_Hasso_MLT.onCreated(function (){
+// 	let instance = this;
+//
+// 	instance.data.conversation = {};
+//
+//
+// 	// transform the result into a form which can be used by the generic communication template
+//
+// });

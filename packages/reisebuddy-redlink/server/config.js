@@ -1,4 +1,6 @@
 Meteor.startup(function () {
+	RocketChat.settings.addGroup('Reisebuddy');
+
 	RocketChat.settings.add('Livechat_Knowledge_Source', '', {
 		type: 'select',
 		group: 'Reisebuddy',
@@ -27,6 +29,14 @@ Meteor.startup(function () {
 		section: 'Knowledge Base',
 		public: true,
 		i18nLabel: 'Livechat_Knowledge_Redlink_Auth_Token'
+	});
+
+	RocketChat.settings.add('Livechat_Knowledge_Redlink_Domain', 'demo.assistify.de', {
+		type: 'string',
+		group: 'reisebuddy',
+		section: 'Knowledge Base',
+		public: true,
+		i18nLabel: 'Livechat_Knowledge_Redlink_URL'
 	});
 });
 

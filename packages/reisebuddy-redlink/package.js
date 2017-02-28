@@ -18,7 +18,6 @@ function addDirectory(api, pathInPackage, environment) {
 
 Package.onUse(function (api) {
 
-	api.versionsFrom('1.2.1');
 	api.use(['ecmascript', 'underscore']);
 	api.use('templating', 'client');
 	api.use('less@2.5.1');

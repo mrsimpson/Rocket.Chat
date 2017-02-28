@@ -26,19 +26,6 @@ RocketChat.roomTypes = new class roomTypesClient extends roomTypesCommon
 
 	findRoom: (roomType, identifier, user) ->
 		return @roomTypes[roomType]?.findRoom identifier, user
-	###
-  RB: adds the option to override the template for a room
-	@param identifier the room identifer (like 'l' for livechat)
-	@param newTemplateName the new template
-	###
-	updateTemplate = (identifier, newTemplateName) ->
-		unless identifier? and roomTypes[identifier] and newTemplateName?
-			return false
-		roomTypes[identifier].template = newTemplateName;
-
-	# addType: addType
-	getTypes: getAllTypes
-	getIdentifiers: getIdentifiers
 
 	canSendMessage: (roomId) ->
 		return ChatSubscription.find({ rid: roomId }).count() > 0
@@ -96,6 +83,3 @@ RocketChat.roomTypes = new class roomTypesClient extends roomTypesCommon
 			return false
 
 		return @roomTypes[roomType].notSubscribedTpl
-	updateTemplate: updateTemplate
-
-	add: add

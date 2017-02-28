@@ -61,7 +61,7 @@ Template.reisebuddy_externalSearch.helpers({
 					filledQuerySlots.push(slot);
 				});
 
-				extendedQueryTpl.filledQuerySlots = filledQuerySlots;
+				extendedQueryTpl.filledQuerySlots = filledQuerySlots.filter( (slot) => {slot.role != 'topic'}); //topic represents the template itself
 				extendedQueryTpl.forItem = function (itm) {
 					let returnValue = {
 						htmlId: Meteor.uuid(),
@@ -98,7 +98,7 @@ Template.reisebuddy_externalSearch.helpers({
 		const instance = Template.instance();
 		$(queries).each(function (indx, queryItem) {
 			if(queries[indx].creator && typeof queries[indx].creator == "string") {
-				queries[indx].replacedCreator = queries[indx].creator.replace(/\./g, "_");
+				queries[indx].replacedCreator = queries[indx].creator.replace(/\.|-/g, "_");
 			} else {
 				queries[indx].replacedCreator = "";
 			}
@@ -108,6 +108,11 @@ Template.reisebuddy_externalSearch.helpers({
 			roomId: instance.data.rid,
 			templateIndex: templateIndex
 		}
+	}
+	,
+	helpRequestByRoom(){
+		const instance = Template.instance();
+		return instance.helpRequest.get();
 	}
 });
 
@@ -342,14 +347,32 @@ Template.reisebuddy_externalSearch.events({
 
 Template.reisebuddy_externalSearch.onCreated(function () {
 	this.externalMessages = new ReactiveVar([]);
+	this.helpRequest = new ReactiveVar({});
 	this.roomId = null;
+
+	const self = this;
 	this.autorun(() => {
-		this.roomId = Template.currentData().rid;
-		this.subscribe('livechat:externalMessages', Template.currentData().rid);
-		const extMsg = RocketChat.models.LivechatExternalMessage.findByRoomId(Template.currentData().rid,
-			{ts: -1}).fetch();
+		self.roomId = Template.currentData().rid;
+		self.subscribe('livechat:externalMessages', self.roomId);
+		const extMsg = RocketChat.models.LivechatExternalMessage.findByRoomId(self.roomId, {ts: -1}).fetch();
 		if (extMsg.length > 0) {
-			this.externalMessages.set(extMsg[0]);
+			self.externalMessages.set(extMsg[0]);
 		}
+
+		/*if(self.roomId){
+			self.subscribe('p2phelp:helpRequest', self.roomId);
+			const helpRequest = RocketChat.models.HelpRequests.findOneByRoomId(self.roomId);
+			self.helpRequest.set(helpRequest);
+
+			if(!helpRequest){ //todo remove after PoC: Non-reactive method call
+				Meteor.call('p2phelp:helpRequestByRoomId', self.roomId,(err, result) => {
+					if(!err){
+						self.helpRequest.set(result);
+					} else {
+						console.log(err);
+					}
+				});
+			}
+		}*/
 	});
 });
