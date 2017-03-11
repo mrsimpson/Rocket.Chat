@@ -78,76 +78,78 @@ Meteor.startup ->
 		if !target.closest('.message-cog-container').length and !target.is('.message-cog-container')
 			RocketChat.MessageAction.hideDropDown()
 
-	RocketChat.MessageAction.addButton
-		id: 'edit-message'
-		icon: 'icon-pencil'
-		i18nLabel: 'Edit'
-		context: [
-			'message'
-			'message-mobile'
-		]
-		action: (e, instance) ->
-			message = $(e.currentTarget).closest('.message')[0]
-			chatMessages[Session.get('openedRoom')].edit(message)
-			RocketChat.MessageAction.hideDropDown()
-			input = instance.find('.input-message')
-			Meteor.setTimeout ->
-				input.focus()
-				input.updateAutogrow()
-			, 200
-		validation: (message) ->
-			room = RocketChat.models.Rooms.findOne({ _id: message.rid })
+		toggle = RocketChat.settings.get('Reisebuddy_Edit_Message')
+		if toggle == false
+			RocketChat.MessageAction.addButton
+				id: 'edit-message'
+				icon: 'icon-pencil'
+				i18nLabel: 'Edit'
+				context: [
+					'message'
+					'message-mobile'
+				]
+				action: (e, instance) ->
+					message = $(e.currentTarget).closest('.message')[0]
+					chatMessages[Session.get('openedRoom')].edit(message)
+					RocketChat.MessageAction.hideDropDown()
+					input = instance.find('.input-message')
+					Meteor.setTimeout ->
+						input.focus()
+						input.updateAutogrow()
+					, 200
+				validation: (message) ->
+					room = RocketChat.models.Rooms.findOne({ _id: message.rid })
 
-			if Array.isArray(room.usernames) && room.usernames.indexOf(Meteor.user().username) is -1
-				return false
+					if Array.isArray(room.usernames) && room.usernames.indexOf(Meteor.user().username) is -1
+						return false
 
-			hasPermission = RocketChat.authz.hasAtLeastOnePermission('edit-message', message.rid)
-			isEditAllowed = RocketChat.settings.get 'Message_AllowEditing'
-			editOwn = message.u?._id is Meteor.userId()
+					hasPermission = RocketChat.authz.hasAtLeastOnePermission('edit-message', message.rid)
+					isEditAllowed = RocketChat.settings.get 'Message_AllowEditing'
+					editOwn = message.u?._id is Meteor.userId()
 
-			return unless hasPermission or (isEditAllowed and editOwn)
+					return unless hasPermission or (isEditAllowed and editOwn)
 
-			blockEditInMinutes = RocketChat.settings.get 'Message_AllowEditing_BlockEditInMinutes'
-			if blockEditInMinutes? and blockEditInMinutes isnt 0
-				msgTs = moment(message.ts) if message.ts?
-				currentTsDiff = moment().diff(msgTs, 'minutes') if msgTs?
-				return currentTsDiff < blockEditInMinutes
-			else
-				return true
-		order: 1
+					blockEditInMinutes = RocketChat.settings.get 'Message_AllowEditing_BlockEditInMinutes'
+					if blockEditInMinutes? and blockEditInMinutes isnt 0
+						msgTs = moment(message.ts) if message.ts?
+						currentTsDiff = moment().diff(msgTs, 'minutes') if msgTs?
+						return currentTsDiff < blockEditInMinutes
+					else
+						return true
+				order: 1
 
-	RocketChat.MessageAction.addButton
-		id: 'delete-message'
-		icon: 'icon-trash-alt'
-		i18nLabel: 'Delete'
-		context: [
-			'message'
-			'message-mobile'
-		]
-		action: (event, instance) ->
-			message = @_arguments[1]
-			RocketChat.MessageAction.hideDropDown()
-			chatMessages[Session.get('openedRoom')].confirmDeleteMsg(message)
-		validation: (message) ->
-			room = RocketChat.models.Rooms.findOne({ _id: message.rid })
+			RocketChat.MessageAction.addButton
+				id: 'delete-message'
+				icon: 'icon-trash-alt'
+				i18nLabel: 'Delete'
+				context: [
+					'message'
+					'message-mobile'
+				]
+				action: (event, instance) ->
+					message = @_arguments[1]
+					RocketChat.MessageAction.hideDropDown()
+					chatMessages[Session.get('openedRoom')].confirmDeleteMsg(message)
+				validation: (message) ->
+					room = RocketChat.models.Rooms.findOne({ _id: message.rid })
 
-			if Array.isArray(room.usernames) && room.usernames.indexOf(Meteor.user().username) is -1
-				return false
+					if Array.isArray(room.usernames) && room.usernames.indexOf(Meteor.user().username) is -1
+						return false
 
-			hasPermission = RocketChat.authz.hasAtLeastOnePermission('delete-message', message.rid)
-			isDeleteAllowed = RocketChat.settings.get 'Message_AllowDeleting'
-			deleteOwn = message.u?._id is Meteor.userId()
+					hasPermission = RocketChat.authz.hasAtLeastOnePermission('delete-message', message.rid)
+					isDeleteAllowed = RocketChat.settings.get 'Message_AllowDeleting'
+					deleteOwn = message.u?._id is Meteor.userId()
 
-			return unless hasPermission or (isDeleteAllowed and deleteOwn)
+					return unless hasPermission or (isDeleteAllowed and deleteOwn)
 
-			blockDeleteInMinutes = RocketChat.settings.get 'Message_AllowDeleting_BlockDeleteInMinutes'
-			if blockDeleteInMinutes? and blockDeleteInMinutes isnt 0
-				msgTs = moment(message.ts) if message.ts?
-				currentTsDiff = moment().diff(msgTs, 'minutes') if msgTs?
-				return currentTsDiff < blockDeleteInMinutes
-			else
-				return true
-		order: 2
+					blockDeleteInMinutes = RocketChat.settings.get 'Message_AllowDeleting_BlockDeleteInMinutes'
+					if blockDeleteInMinutes? and blockDeleteInMinutes isnt 0
+						msgTs = moment(message.ts) if message.ts?
+						currentTsDiff = moment().diff(msgTs, 'minutes') if msgTs?
+						return currentTsDiff < blockDeleteInMinutes
+					else
+						return true
+				order: 2
 
 	RocketChat.MessageAction.addButton
 		id: 'permalink'
