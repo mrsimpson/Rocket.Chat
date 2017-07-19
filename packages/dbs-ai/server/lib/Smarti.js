@@ -1,4 +1,4 @@
-/* globals _dbs, SystemLogger, RocketChat, console */
+/* globals _dbs, SystemLogger, RocketChat */
 
 class SmartiAdapter {
 	constructor(adapterProps) {
@@ -120,9 +120,7 @@ class SmartiAdapterFactory {
 
 			adapterProps.webhookUrl = `${ RocketChat.settings.get('Site_Url') }api/v1/smarti.result/${ RocketChat.settings.get('DBS_AI_Redlink_Hook_Token') }`;
 
-			// TODO: Don not user 'console'
-			// console.log(RocketChat.settings);
-			// console.log(Meteor.settings);
+			SystemLogger.debug(RocketChat.settings);
 
 			if (_dbs.mockInterfaces()) { //use mock
 				this.singleton = new SmartiMock(adapterProps);
@@ -140,7 +138,7 @@ _dbs.SmartiAdapterFactory = SmartiAdapterFactory;
  * add method to get conversation id via realtime api
  */
 Meteor.methods({
-	getLastSmartiResult:function(rid) {
+	getLastSmartiResult(rid) {
 
 		//Todo: check if the user is allowed to get this results!
 
@@ -162,7 +160,7 @@ RocketChat.API.v1.addRoute('smarti.result/:token', {authRequired: false}, {
 		}));
 
 		//verify token
-		if (this.urlParams.token && this.urlParams.token == RocketChat.settings.get('DBS_AI_Redlink_Hook_Token')) {
+		if (this.urlParams.token && this.urlParams.token === RocketChat.settings.get('DBS_AI_Redlink_Hook_Token')) {
 
 			SystemLogger.debug('Smarti - got conversation result:', JSON.stringify(this.bodyParams, null, 2));
 			RocketChat.models.LivechatExternalMessage.update(
