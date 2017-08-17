@@ -35,7 +35,7 @@ RocketChat.roomTypes.add('r', 6, { //5 is livechat
 	},
 
 	condition() {
-		return RocketChat.authz.hasAtLeastOnePermission(['view-c-room', 'view-joined-room']); //todo: own permission
+		return RocketChat.authz.hasAtLeastOnePermission(['view-r-room', 'view-joined-room']);
 	},
 
 	showJoinLink(roomId) {
@@ -72,6 +72,6 @@ RocketChat.roomTypes.add('e', 15, { //20 = private messages
 	},
 
 	condition() {
-		return RocketChat.authz.hasAllPermission('view-p-room'); //todo: Own authorization
+		return RocketChat.authz.hasAllPermission('view-e-room');
 	}
 });
