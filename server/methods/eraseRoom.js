@@ -17,12 +17,7 @@ Meteor.methods({
 			});
 		}
 
-		/*
-		dirty hack since custom permissions create in packages/assistify-help-request/startup/customRoomTypes.js
-		lead to a streamer exception in some occasions.
-		*/
-		if ((room.t === 'e' && RocketChat.authz.hasPermission(fromId, 'delete-c', rid)) ||
-			RocketChat.authz.hasPermission(fromId, `delete-${ room.t }`, rid)) {
+		if (RocketChat.authz.hasPermission(fromId, `delete-${ room.t }`, rid)) {
 			RocketChat.models.Messages.removeByRoomId(rid);
 			RocketChat.models.Subscriptions.removeByRoomId(rid);
 			return RocketChat.models.Rooms.removeById(rid);

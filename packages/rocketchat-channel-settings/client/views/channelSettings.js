@@ -50,13 +50,6 @@ Template.channelSettings.helpers({
 			}
 		});
 		const roomType = room && room.t;
-		/*
-		dirty hack since custom permissions create in packages/assistify-help-request/startup/customRoomTypes.js
-		lead to a streamer exception in some occasions.
-		*/
-		if (roomType === 'e') {
-			return roomType && RocketChat.authz.hasAtLeastOnePermission('delete-c');
-		}
 		return roomType && RocketChat.authz.hasAtLeastOnePermission(`delete-${ roomType }`, this.rid);
 	},
 	readOnly() {
