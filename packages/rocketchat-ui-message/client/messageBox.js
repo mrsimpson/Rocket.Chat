@@ -250,10 +250,11 @@ Template.messageBox.events({
 	},
 	'focus .input-message'(event, instance) {
 		KonchatNotification.removeRoomNotification(this._id);
-		chatMessages[this._id].input = instance.find('.input-message');
-		if (instance.find('.input-message').value !== '') {
-			chatMessages[this._id].input.updateAutogrow();
+		const input = event.target;
+		chatMessages[this._id].input = input;
+		if (event.target.value !== '') {
 			instance.isMessageFieldEmpty.set(false);
+			return typeof input.updateAutogrow === 'function' && input.updateAutogrow();
 		}
 	},
 	'click .send-button'(event, instance) {
@@ -261,7 +262,6 @@ Template.messageBox.events({
 		chatMessages[this._id].send(this._id, input, () => {
 			// fixes https://github.com/RocketChat/Rocket.Chat/issues/3037
 			// at this point, the input is cleared and ready for autogrow
-			input.updateAutogrow();
 			return instance.isMessageFieldEmpty.set(chatMessages[this._id].isEmpty());
 		});
 		return input.focus();
