@@ -262,6 +262,7 @@ Template.messageBox.events({
 		chatMessages[this._id].send(this._id, input, () => {
 			// fixes https://github.com/RocketChat/Rocket.Chat/issues/3037
 			// at this point, the input is cleared and ready for autogrow
+			input.updateAutogrow();
 			return instance.isMessageFieldEmpty.set(chatMessages[this._id].isEmpty());
 		});
 		return input.focus();
